@@ -2,6 +2,11 @@ name: OmniSight Scanner
 
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: "scan | weekly | monthly"
+        required: false
+        default: "scan"
 
 jobs:
   run:
