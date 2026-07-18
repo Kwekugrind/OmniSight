@@ -9,10 +9,10 @@ const OWNER = "Kwekugrind";   // ✅ Your GitHub username
 
 const REPOS = [
   { name: "coffee", label: "Coffee Machine" },
-  { name: "tea-machine", label: "Tea Machine" },
-  { name: "milk-machine", label: "Milk Machine" },
-  { name: "ice-cream-machine", label: "Ice Cream Machine" },
-  { name: "lerys-elite-alerts", label: "Lery's Elite Alerts" }
+  { name: "Tea", label: "Tea Machine" },
+  { name: "Milk", label: "Milk Machine" },
+  { name: "ice-cream", label: "Ice Cream Machine" },
+  { name: "Lery-s-Alerts", label: "Lery's Elite Alerts" }
 ];
 
 const FILE_PATH = "trades.json";
