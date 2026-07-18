@@ -4,15 +4,16 @@ import fs from "fs";
 const GITHUB_TOKEN = process.env.GH_TOKEN;
 const TELEGRAM_TOKEN = process.env.TG_BOT_TOKEN;
 const TELEGRAM_CHAT = process.env.TG_CHAT_ID;
+const MODE = process.env.MODE || "scan";
 
-const OWNER = "Kwekugrind";   // ✅ Your GitHub username
+const OWNER = "Kwekugrind";
 
 const REPOS = [
   { name: "coffee", label: "Coffee Machine" },
-  { name: "Tea", label: "Tea Machine" },
-  { name: "Milk", label: "Milk Machine" },
-  { name: "ice-cream", label: "Ice Cream Machine" },
-  { name: "Lery-s-Alerts", label: "Lery's Elite Alerts" }
+  { name: "tea-machine", label: "Tea Machine" },
+  { name: "milk-machine", label: "Milk Machine" },
+  { name: "ice-cream-machine", label: "Ice Cream Machine" },
+  { name: "lerys-elite-alerts", label: "Lery's Elite Alerts" }
 ];
 
 const FILE_PATH = "trades.json";
@@ -23,9 +24,6 @@ const BRANCH = "main";
 async function getTrades(repo) {
   const url = `https://api.github.com/repos/${OWNER}/${repo}/contents/${FILE_PATH}?ref=${BRANCH}`;
 
-  console.log("Checking repo:", repo);
-  console.log("URL:", url);
-
   const res = await fetch(url, {
     headers: {
       Authorization: `Bearer ${GITHUB_TOKEN}`,
@@ -33,13 +31,7 @@ async function getTrades(repo) {
     }
   });
 
-  console.log(`Status for ${repo}:`, res.status);
-
-  if (res.status !== 200) {
-    const text = await res.text();
-    console.log(`Response for ${repo}:`, text);
-    return [];
-  }
+  if (res.status !== 200) return [];
 
   const data = await res.json();
   const content = Buffer.from(data.content, "base64").toString("utf-8");
@@ -73,9 +65,9 @@ function saveTrackerState(state) {
   fs.writeFileSync("tracker_state.json", JSON.stringify(state, null, 2));
 }
 
-/* ------------------------- MAIN SCANNER ------------------------- */
+/* ------------------------- SCAN MODE ------------------------- */
 
-(async () => {
+async function runScanner() {
 
   const tracker = loadTrackerState();
 
@@ -99,9 +91,6 @@ ${trade.result === "WIN" ? "✅ WIN" : "❌ LOSS"}
 Symbol: ${trade.symbol}
 Direction: ${trade.direction}
 RR: ${trade.result === "WIN" ? "+" + trade.rr : "-1"}
-
-Opened: ${trade.openTime}
-Closed: ${trade.closeTime}
 `;
 
           await sendTelegram(message);
@@ -113,7 +102,96 @@ Closed: ${trade.closeTime}
   }
 
   saveTrackerState(tracker);
+}
 
-  console.log("✅ OmniSight scan complete.");
+/* ------------------------- WEEKLY MODE ------------------------- */
+
+async function runWeeklyReport() {
+
+  let allTrades = [];
+
+  for (const repo of REPOS) {
+    const trades = await getTrades(repo.name);
+    allTrades = allTrades.concat(trades);
+  }
+
+  const now = new Date();
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(now.getDate() - 7);
+
+  const weeklyTrades = allTrades.filter(t =>
+    t.result &&
+    new Date(t.closeTime) >= sevenDaysAgo
+  );
+
+  const wins = weeklyTrades.filter(t => t.result === "WIN").length;
+  const losses = weeklyTrades.filter(t => t.result === "LOSS").length;
+  const total = weeklyTrades.length;
+  const winRate = total > 0 ? ((wins / total) * 100).toFixed(1) : 0;
+
+  const message = `
+📊 OmniSight Weekly Report
+
+Total Trades: ${total}
+Wins: ${wins}
+Losses: ${losses}
+Win Rate: ${winRate}%
+`;
+
+  await sendTelegram(message);
+}
+
+/* ------------------------- MONTHLY MODE ------------------------- */
+
+async function runMonthlyReport() {
+
+  let allTrades = [];
+
+  for (const repo of REPOS) {
+    const trades = await getTrades(repo.name);
+    allTrades = allTrades.concat(trades);
+  }
+
+  const now = new Date();
+  const monthAgo = new Date();
+  monthAgo.setMonth(now.getMonth() - 1);
+
+  const monthlyTrades = allTrades.filter(t =>
+    t.result &&
+    new Date(t.closeTime) >= monthAgo
+  );
+
+  const wins = monthlyTrades.filter(t => t.result === "WIN").length;
+  const losses = monthlyTrades.filter(t => t.result === "LOSS").length;
+  const total = monthlyTrades.length;
+  const winRate = total > 0 ? ((wins / total) * 100).toFixed(1) : 0;
+
+  const message = `
+📊 OmniSight Monthly Report
+
+Total Trades: ${total}
+Wins: ${wins}
+Losses: ${losses}
+Win Rate: ${winRate}%
+`;
+
+  await sendTelegram(message);
+}
+
+/* ------------------------- MAIN ------------------------- */
+
+(async () => {
+
+  console.log("Running mode:", MODE);
+
+  if (MODE === "scan") {
+    await runScanner();
+  } else if (MODE === "weekly") {
+    await runWeeklyReport();
+  } else if (MODE === "monthly") {
+    await runMonthlyReport();
+  }
+
+  console.log("✅ OmniSight complete.");
 
 })();
