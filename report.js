@@ -5,7 +5,7 @@ const GITHUB_TOKEN = process.env.GH_TOKEN;
 const TELEGRAM_TOKEN = process.env.TG_BOT_TOKEN;
 const TELEGRAM_CHAT = process.env.TG_CHAT_ID;
 
-const OWNER = "Kwekugrind";
+const OWNER = "YOUR_GITHUB_USERNAME";  // 🔴 CHANGE THIS
 
 const REPOS = [
   { name: "coffee-machine", label: "Coffee Machine" },
@@ -18,6 +18,8 @@ const REPOS = [
 const FILE_PATH = "trades.json";
 const BRANCH = "main";
 
+/* ------------------------- FETCH TRADES ------------------------- */
+
 async function getTrades(repo) {
   const url = `https://api.github.com/repos/${OWNER}/${repo}/contents/${FILE_PATH}?ref=${BRANCH}`;
 
@@ -27,13 +29,18 @@ async function getTrades(repo) {
     }
   });
 
-  if (res.status !== 200) return [];
+  if (res.status !== 200) {
+    console.log(`No trades.json found in ${repo}`);
+    return [];
+  }
 
   const data = await res.json();
   const content = Buffer.from(data.content, "base64").toString("utf-8");
 
   return JSON.parse(content);
 }
+
+/* ------------------------- TELEGRAM ------------------------- */
 
 async function sendTelegram(message) {
   await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
@@ -46,6 +53,8 @@ async function sendTelegram(message) {
   });
 }
 
+/* ------------------------- TRACKER MEMORY ------------------------- */
+
 function loadTrackerState() {
   if (!fs.existsSync("tracker_state.json")) {
     return { processed: [] };
@@ -57,13 +66,18 @@ function saveTrackerState(state) {
   fs.writeFileSync("tracker_state.json", JSON.stringify(state, null, 2));
 }
 
+/* ------------------------- MAIN SCANNER ------------------------- */
+
 (async () => {
+
   const tracker = loadTrackerState();
 
   for (const repo of REPOS) {
+
     const trades = await getTrades(repo.name);
 
     for (const trade of trades) {
+
       const tradeId = `${repo.name}-${trade.openTime}`;
 
       if (!tracker.processed.includes(tradeId)) {
@@ -92,4 +106,7 @@ Closed: ${trade.closeTime}
   }
 
   saveTrackerState(tracker);
+
+  console.log("✅ OmniSight scan complete.");
+
 })();
