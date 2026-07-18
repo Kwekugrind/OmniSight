@@ -104,78 +104,144 @@ RR: ${trade.result === "WIN" ? "+" + trade.rr : "-1"}
   saveTrackerState(tracker);
 }
 
-/* ------------------------- WEEKLY MODE ------------------------- */
+/* ------------------------- WEEKLY REPORT ------------------------- */
 
 async function runWeeklyReport() {
 
-  let allTrades = [];
-
-  for (const repo of REPOS) {
-    const trades = await getTrades(repo.name);
-    allTrades = allTrades.concat(trades);
-  }
+  let reportText = "📊 OmniSight Weekly Report\n\n";
 
   const now = new Date();
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(now.getDate() - 7);
 
-  const weeklyTrades = allTrades.filter(t =>
-    t.result &&
-    new Date(t.closeTime) >= sevenDaysAgo
-  );
+  let totalWins = 0;
+  let totalLosses = 0;
+  let totalTrades = 0;
+  let netR = 0;
 
-  const wins = weeklyTrades.filter(t => t.result === "WIN").length;
-  const losses = weeklyTrades.filter(t => t.result === "LOSS").length;
-  const total = weeklyTrades.length;
-  const winRate = total > 0 ? ((wins / total) * 100).toFixed(1) : 0;
+  for (const repo of REPOS) {
 
-  const message = `
-📊 OmniSight Weekly Report
+    const trades = await getTrades(repo.name);
 
-Total Trades: ${total}
+    const weeklyTrades = trades.filter(t =>
+      t.result &&
+      new Date(t.closeTime) >= sevenDaysAgo
+    );
+
+    const wins = weeklyTrades.filter(t => t.result === "WIN").length;
+    const losses = weeklyTrades.filter(t => t.result === "LOSS").length;
+    const repoTotal = weeklyTrades.length;
+
+    const repoNetR =
+      weeklyTrades.reduce((sum, t) =>
+        sum + (t.result === "WIN" ? t.rr : -1), 0);
+
+    if (repoTotal > 0) {
+
+      const winRate = ((wins / repoTotal) * 100).toFixed(1);
+
+      reportText += `
+${repo.label}
+Trades: ${repoTotal}
 Wins: ${wins}
 Losses: ${losses}
 Win Rate: ${winRate}%
+Net R: ${repoNetR > 0 ? "+" : ""}${repoNetR}R
+
+`;
+    }
+
+    totalWins += wins;
+    totalLosses += losses;
+    totalTrades += repoTotal;
+    netR += repoNetR;
+  }
+
+  const overallWinRate =
+    totalTrades > 0 ? ((totalWins / totalTrades) * 100).toFixed(1) : 0;
+
+  reportText += `
+──────────────
+Combined Portfolio
+
+Trades: ${totalTrades}
+Wins: ${totalWins}
+Losses: ${totalLosses}
+Win Rate: ${overallWinRate}%
+Net R: ${netR > 0 ? "+" : ""}${netR}R
 `;
 
-  await sendTelegram(message);
+  await sendTelegram(reportText);
 }
 
-/* ------------------------- MONTHLY MODE ------------------------- */
+/* ------------------------- MONTHLY REPORT ------------------------- */
 
 async function runMonthlyReport() {
 
-  let allTrades = [];
-
-  for (const repo of REPOS) {
-    const trades = await getTrades(repo.name);
-    allTrades = allTrades.concat(trades);
-  }
+  let reportText = "📊 OmniSight Monthly Report\n\n";
 
   const now = new Date();
   const monthAgo = new Date();
   monthAgo.setMonth(now.getMonth() - 1);
 
-  const monthlyTrades = allTrades.filter(t =>
-    t.result &&
-    new Date(t.closeTime) >= monthAgo
-  );
+  let totalWins = 0;
+  let totalLosses = 0;
+  let totalTrades = 0;
+  let netR = 0;
 
-  const wins = monthlyTrades.filter(t => t.result === "WIN").length;
-  const losses = monthlyTrades.filter(t => t.result === "LOSS").length;
-  const total = monthlyTrades.length;
-  const winRate = total > 0 ? ((wins / total) * 100).toFixed(1) : 0;
+  for (const repo of REPOS) {
 
-  const message = `
-📊 OmniSight Monthly Report
+    const trades = await getTrades(repo.name);
 
-Total Trades: ${total}
+    const monthlyTrades = trades.filter(t =>
+      t.result &&
+      new Date(t.closeTime) >= monthAgo
+    );
+
+    const wins = monthlyTrades.filter(t => t.result === "WIN").length;
+    const losses = monthlyTrades.filter(t => t.result === "LOSS").length;
+    const repoTotal = monthlyTrades.length;
+
+    const repoNetR =
+      monthlyTrades.reduce((sum, t) =>
+        sum + (t.result === "WIN" ? t.rr : -1), 0);
+
+    if (repoTotal > 0) {
+
+      const winRate = ((wins / repoTotal) * 100).toFixed(1);
+
+      reportText += `
+${repo.label}
+Trades: ${repoTotal}
 Wins: ${wins}
 Losses: ${losses}
 Win Rate: ${winRate}%
+Net R: ${repoNetR > 0 ? "+" : ""}${repoNetR}R
+
+`;
+    }
+
+    totalWins += wins;
+    totalLosses += losses;
+    totalTrades += repoTotal;
+    netR += repoNetR;
+  }
+
+  const overallWinRate =
+    totalTrades > 0 ? ((totalWins / totalTrades) * 100).toFixed(1) : 0;
+
+  reportText += `
+──────────────
+Combined Portfolio
+
+Trades: ${totalTrades}
+Wins: ${totalWins}
+Losses: ${totalLosses}
+Win Rate: ${overallWinRate}%
+Net R: ${netR > 0 ? "+" : ""}${netR}R
 `;
 
-  await sendTelegram(message);
+  await sendTelegram(reportText);
 }
 
 /* ------------------------- MAIN ------------------------- */
