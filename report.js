@@ -8,7 +8,7 @@ const TELEGRAM_CHAT = process.env.TG_CHAT_ID;
 const OWNER = "YOUR_GITHUB_USERNAME";  // 🔴 CHANGE THIS
 
 const REPOS = [
-  { name: "coffee-machine", label: "Coffee Machine" },
+  { name: "coffee", label: "Coffee Machine" },
   { name: "tea-machine", label: "Tea Machine" },
   { name: "milk-machine", label: "Milk Machine" },
   { name: "ice-cream-machine", label: "Ice Cream Machine" },
