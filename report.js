@@ -5,7 +5,7 @@ const GITHUB_TOKEN = process.env.GH_TOKEN;
 const TELEGRAM_TOKEN = process.env.TG_BOT_TOKEN;
 const TELEGRAM_CHAT = process.env.TG_CHAT_ID;
 
-const OWNER = "Kwekugrind";  // 🔴 CHANGE THIS
+const OWNER = "Kwekugrind";   // ✅ Your GitHub username
 
 const REPOS = [
   { name: "coffee", label: "Coffee Machine" },
@@ -23,14 +23,21 @@ const BRANCH = "main";
 async function getTrades(repo) {
   const url = `https://api.github.com/repos/${OWNER}/${repo}/contents/${FILE_PATH}?ref=${BRANCH}`;
 
+  console.log("Checking repo:", repo);
+  console.log("URL:", url);
+
   const res = await fetch(url, {
     headers: {
-      Authorization: `Bearer ${GITHUB_TOKEN}`
+      Authorization: `Bearer ${GITHUB_TOKEN}`,
+      Accept: "application/vnd.github+json"
     }
   });
 
+  console.log(`Status for ${repo}:`, res.status);
+
   if (res.status !== 200) {
-    console.log(`No trades.json found in ${repo}`);
+    const text = await res.text();
+    console.log(`Response for ${repo}:`, text);
     return [];
   }
 
