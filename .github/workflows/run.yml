@@ -1,4 +1,4 @@
-name: OmniSight Report
+name: OmniSight Scanner
 
 on:
   workflow_dispatch:
@@ -8,17 +8,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - run: npm install
+      - name: Install Dependencies
+        run: npm install
 
-      - name: Run Report
+      - name: Run OmniSight Scanner
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
         run: node report.js
+
+      - name: Commit tracker state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions@github.com"
+
+          git add tracker_state.json
+
+          git diff --cached --quiet && echo "No changes" && exit 0
+
+          git commit -m "Update tracker state"
+          git push origin HEAD:main
