@@ -5,7 +5,7 @@ const GITHUB_TOKEN = process.env.GH_TOKEN;
 const TELEGRAM_TOKEN = process.env.TG_BOT_TOKEN;
 const TELEGRAM_CHAT = process.env.TG_CHAT_ID;
 
-const OWNER = "YOUR_USERNAME";
+const OWNER = "Kwekugrind";
 
 const REPOS = [
   { name: "coffee-machine", label: "Coffee Machine" },
