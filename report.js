@@ -19,7 +19,7 @@ const REPOS = [
 const FILE_PATH = "trades.json";
 const BRANCH = "main";
 
-/* ------------------------- FETCH TRADES ------------------------- */
+/* ---------------- FETCH TRADES ---------------- */
 
 async function getTrades(repo) {
   const url = `https://api.github.com/repos/${OWNER}/${repo}/contents/${FILE_PATH}?ref=${BRANCH}`;
@@ -39,7 +39,7 @@ async function getTrades(repo) {
   return JSON.parse(content);
 }
 
-/* ------------------------- TELEGRAM ------------------------- */
+/* ---------------- TELEGRAM ---------------- */
 
 async function sendTelegram(message) {
   await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
@@ -52,7 +52,7 @@ async function sendTelegram(message) {
   });
 }
 
-/* ------------------------- TRACKER MEMORY ------------------------- */
+/* ---------------- TRACKER MEMORY ---------------- */
 
 function loadTrackerState() {
   if (!fs.existsSync("tracker_state.json")) {
@@ -65,22 +65,18 @@ function saveTrackerState(state) {
   fs.writeFileSync("tracker_state.json", JSON.stringify(state, null, 2));
 }
 
-/* ------------------------- SCAN MODE ------------------------- */
+/* ---------------- SCAN MODE ---------------- */
 
 async function runScanner() {
-
   const tracker = loadTrackerState();
 
   for (const repo of REPOS) {
-
     const trades = await getTrades(repo.name);
 
     for (const trade of trades) {
-
       const tradeId = `${repo.name}-${trade.openTime}`;
 
       if (!tracker.processed.includes(tradeId)) {
-
         if (trade.result === "WIN" || trade.result === "LOSS") {
 
           const message = `
@@ -94,7 +90,6 @@ RR: ${trade.result === "WIN" ? "+" + trade.rr : "-1"}
 `;
 
           await sendTelegram(message);
-
           tracker.processed.push(tradeId);
         }
       }
@@ -104,16 +99,17 @@ RR: ${trade.result === "WIN" ? "+" + trade.rr : "-1"}
   saveTrackerState(tracker);
 }
 
-/* ------------------------- WEEKLY REPORT ------------------------- */
+/* ---------------- GENERIC SUMMARY FUNCTION ---------------- */
 
-async function runWeeklyReport() {
+async function runSummary(daysBack, title) {
 
-  let reportText = "📊 OmniSight Weekly Report\n\n";
+  let reportText = `📊 OmniSight ${title}\n\n`;
 
   const now = new Date();
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(now.getDate() - 7);
+  const cutoff = new Date();
+  cutoff.setDate(now.getDate() - daysBack);
 
+  let repoStats = [];
   let totalWins = 0;
   let totalLosses = 0;
   let totalTrades = 0;
@@ -123,32 +119,27 @@ async function runWeeklyReport() {
 
     const trades = await getTrades(repo.name);
 
-    const weeklyTrades = trades.filter(t =>
+    const periodTrades = trades.filter(t =>
       t.result &&
-      new Date(t.closeTime) >= sevenDaysAgo
+      new Date(t.closeTime) >= cutoff
     );
 
-    const wins = weeklyTrades.filter(t => t.result === "WIN").length;
-    const losses = weeklyTrades.filter(t => t.result === "LOSS").length;
-    const repoTotal = weeklyTrades.length;
+    const wins = periodTrades.filter(t => t.result === "WIN").length;
+    const losses = periodTrades.filter(t => t.result === "LOSS").length;
+    const repoTotal = periodTrades.length;
 
     const repoNetR =
-      weeklyTrades.reduce((sum, t) =>
+      periodTrades.reduce((sum, t) =>
         sum + (t.result === "WIN" ? t.rr : -1), 0);
 
     if (repoTotal > 0) {
-
-      const winRate = ((wins / repoTotal) * 100).toFixed(1);
-
-      reportText += `
-${repo.label}
-Trades: ${repoTotal}
-Wins: ${wins}
-Losses: ${losses}
-Win Rate: ${winRate}%
-Net R: ${repoNetR > 0 ? "+" : ""}${repoNetR}R
-
-`;
+      repoStats.push({
+        name: repo.label,
+        total: repoTotal,
+        wins,
+        losses,
+        netR: repoNetR
+      });
     }
 
     totalWins += wins;
@@ -156,6 +147,21 @@ Net R: ${repoNetR > 0 ? "+" : ""}${repoNetR}R
     totalTrades += repoTotal;
     netR += repoNetR;
   }
+
+  repoStats.sort((a, b) => b.netR - a.netR);
+
+  repoStats.forEach(r => {
+    const winRate = ((r.wins / r.total) * 100).toFixed(1);
+    reportText += `
+${r.name}
+Trades: ${r.total}
+Wins: ${r.wins}
+Losses: ${r.losses}
+Win Rate: ${winRate}%
+Net R: ${r.netR > 0 ? "+" : ""}${r.netR}R
+
+`;
+  });
 
   const overallWinRate =
     totalTrades > 0 ? ((totalWins / totalTrades) * 100).toFixed(1) : 0;
@@ -171,80 +177,17 @@ Win Rate: ${overallWinRate}%
 Net R: ${netR > 0 ? "+" : ""}${netR}R
 `;
 
-  await sendTelegram(reportText);
-}
-
-/* ------------------------- MONTHLY REPORT ------------------------- */
-
-async function runMonthlyReport() {
-
-  let reportText = "📊 OmniSight Monthly Report\n\n";
-
-  const now = new Date();
-  const monthAgo = new Date();
-  monthAgo.setMonth(now.getMonth() - 1);
-
-  let totalWins = 0;
-  let totalLosses = 0;
-  let totalTrades = 0;
-  let netR = 0;
-
-  for (const repo of REPOS) {
-
-    const trades = await getTrades(repo.name);
-
-    const monthlyTrades = trades.filter(t =>
-      t.result &&
-      new Date(t.closeTime) >= monthAgo
-    );
-
-    const wins = monthlyTrades.filter(t => t.result === "WIN").length;
-    const losses = monthlyTrades.filter(t => t.result === "LOSS").length;
-    const repoTotal = monthlyTrades.length;
-
-    const repoNetR =
-      monthlyTrades.reduce((sum, t) =>
-        sum + (t.result === "WIN" ? t.rr : -1), 0);
-
-    if (repoTotal > 0) {
-
-      const winRate = ((wins / repoTotal) * 100).toFixed(1);
-
-      reportText += `
-${repo.label}
-Trades: ${repoTotal}
-Wins: ${wins}
-Losses: ${losses}
-Win Rate: ${winRate}%
-Net R: ${repoNetR > 0 ? "+" : ""}${repoNetR}R
-
+  if (repoStats.length > 0) {
+    reportText += `
+🏆 Best: ${repoStats[0].name}
+📉 Worst: ${repoStats[repoStats.length - 1].name}
 `;
-    }
-
-    totalWins += wins;
-    totalLosses += losses;
-    totalTrades += repoTotal;
-    netR += repoNetR;
   }
 
-  const overallWinRate =
-    totalTrades > 0 ? ((totalWins / totalTrades) * 100).toFixed(1) : 0;
-
-  reportText += `
-──────────────
-Combined Portfolio
-
-Trades: ${totalTrades}
-Wins: ${totalWins}
-Losses: ${totalLosses}
-Win Rate: ${overallWinRate}%
-Net R: ${netR > 0 ? "+" : ""}${netR}R
-`;
-
   await sendTelegram(reportText);
 }
 
-/* ------------------------- MAIN ------------------------- */
+/* ---------------- MAIN ---------------- */
 
 (async () => {
 
@@ -252,10 +195,14 @@ Net R: ${netR > 0 ? "+" : ""}${netR}R
 
   if (MODE === "scan") {
     await runScanner();
-  } else if (MODE === "weekly") {
-    await runWeeklyReport();
-  } else if (MODE === "monthly") {
-    await runMonthlyReport();
+  }
+
+  else if (MODE === "weekly") {
+    await runSummary(7, "Weekly Report");
+  }
+
+  else if (MODE === "monthly") {
+    await runSummary(30, "Monthly Report");
   }
 
   console.log("✅ OmniSight complete.");
