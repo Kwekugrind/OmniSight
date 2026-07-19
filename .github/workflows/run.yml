@@ -29,6 +29,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          MODE: ${{ github.event.inputs.mode }}
         run: node report.js
 
       - name: Commit tracker state
