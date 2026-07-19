@@ -83,7 +83,6 @@ async function runScanner() {
 📊 ${repo.label}
 
 ${trade.result === "WIN" ? "✅ WIN" : "❌ LOSS"}
-
 Symbol: ${trade.symbol}
 Direction: ${trade.direction}
 RR: ${trade.result === "WIN" ? "+" + trade.rr : "-1"}
@@ -99,7 +98,7 @@ RR: ${trade.result === "WIN" ? "+" + trade.rr : "-1"}
   saveTrackerState(tracker);
 }
 
-/* ---------------- GENERIC SUMMARY FUNCTION ---------------- */
+/* ---------------- SUMMARY ENGINE ---------------- */
 
 async function runSummary(daysBack, title) {
 
@@ -109,11 +108,10 @@ async function runSummary(daysBack, title) {
   const cutoff = new Date();
   cutoff.setDate(now.getDate() - daysBack);
 
-  let repoStats = [];
   let totalWins = 0;
   let totalLosses = 0;
   let totalTrades = 0;
-  let netR = 0;
+  let totalNetR = 0;
 
   for (const repo of REPOS) {
 
@@ -133,56 +131,39 @@ async function runSummary(daysBack, title) {
         sum + (t.result === "WIN" ? t.rr : -1), 0);
 
     if (repoTotal > 0) {
-      repoStats.push({
-        name: repo.label,
-        total: repoTotal,
-        wins,
-        losses,
-        netR: repoNetR
-      });
+
+      const winRate = ((wins / repoTotal) * 100).toFixed(1);
+
+      reportText += `
+${repo.label}
+Trades: ${repoTotal}
+Wins: ${wins}
+Losses: ${losses}
+Win Rate: ${winRate}%
+Net R: ${repoNetR > 0 ? "+" : ""}${repoNetR}R
+
+`;
     }
 
     totalWins += wins;
     totalLosses += losses;
     totalTrades += repoTotal;
-    netR += repoNetR;
+    totalNetR += repoNetR;
   }
-
-  repoStats.sort((a, b) => b.netR - a.netR);
-
-  repoStats.forEach(r => {
-    const winRate = ((r.wins / r.total) * 100).toFixed(1);
-    reportText += `
-${r.name}
-Trades: ${r.total}
-Wins: ${r.wins}
-Losses: ${r.losses}
-Win Rate: ${winRate}%
-Net R: ${r.netR > 0 ? "+" : ""}${r.netR}R
-
-`;
-  });
 
   const overallWinRate =
     totalTrades > 0 ? ((totalWins / totalTrades) * 100).toFixed(1) : 0;
 
   reportText += `
 ──────────────
-Combined Portfolio
+📈 Combined Portfolio
 
 Trades: ${totalTrades}
 Wins: ${totalWins}
 Losses: ${totalLosses}
 Win Rate: ${overallWinRate}%
-Net R: ${netR > 0 ? "+" : ""}${netR}R
+Net R: ${totalNetR > 0 ? "+" : ""}${totalNetR}R
 `;
-
-  if (repoStats.length > 0) {
-    reportText += `
-🏆 Best: ${repoStats[0].name}
-📉 Worst: ${repoStats[repoStats.length - 1].name}
-`;
-  }
 
   await sendTelegram(reportText);
 }
