@@ -122,7 +122,7 @@ async function sendTelegram(message) {
   });
 }
 
-/* ---------------- SCAN MODE ---------------- */
+/* ---------------- SCAN MODE (DUPLICATE-PROOF) ---------------- */
 
 async function runScanner() {
 
@@ -134,7 +134,6 @@ async function runScanner() {
     if (!file) continue;
 
     let trades = file.data;
-    let updated = false;
 
     for (let i = 0; i < trades.length; i++) {
 
@@ -179,7 +178,8 @@ async function runScanner() {
       if (resolved) {
 
         trade.closeTime = new Date().toISOString();
-        updated = true;
+
+        await updateFile(repo.name, trades, file.sha);
 
         await sendTelegram(`
 ${trade.result === "WIN" ? "✅" : "❌"} ${repo.label} ${trade.result}
@@ -194,17 +194,15 @@ RR: ${trade.result === "WIN" ? "+" + trade.rr : "-1"}R
 Signal Time: ${trade.openTime}
 Close Time: ${trade.closeTime}
 `);
-      }
-    }
 
-    if (updated) {
-      await updateFile(repo.name, trades, file.sha);
-      console.log(`Updated trades for ${repo.label}`);
+        // ✅ Stop processing this repo after first update
+        break;
+      }
     }
   }
 }
 
-/* ---------------- SUMMARY ENGINE ---------------- */
+/* ---------------- WEEKLY & MONTHLY SUMMARY ---------------- */
 
 async function runSummary(daysBack, title) {
 
