@@ -9,7 +9,6 @@ const MODE = process.env.MODE || "scan";
 
 const OWNER = "Kwekugrind";
 
-/* ✅ EXACT REPO NAMES */
 const REPOS = [
   { name: "coffee", label: "Coffee Machine" },
   { name: "Tea", label: "Tea Machine" },
@@ -123,7 +122,7 @@ async function sendTelegram(message) {
   });
 }
 
-/* ---------------- SCAN MODE (AUTO RESOLVE) ---------------- */
+/* ---------------- SCAN MODE ---------------- */
 
 async function runScanner() {
 
@@ -137,9 +136,11 @@ async function runScanner() {
     let trades = file.data;
     let updated = false;
 
-    for (let trade of trades) {
+    for (let i = 0; i < trades.length; i++) {
 
-      // ✅ Prevent duplicate processing
+      let trade = trades[i];
+
+      // ✅ Skip already resolved trades
       if (trade.result !== null) continue;
 
       const currentPrice = await getCurrentPrice(trade.symbol);
@@ -147,94 +148,52 @@ async function runScanner() {
       console.log(`Current Price: ${currentPrice}`);
       console.log(`TP: ${trade.tp} | SL: ${trade.stop}`);
 
+      let resolved = false;
+
       if (trade.direction === "BUY") {
 
         if (currentPrice >= trade.tp) {
-
           trade.result = "WIN";
-          trade.closeTime = new Date().toISOString();
-          updated = true;
-
-          await sendTelegram(`
-✅ ${repo.label} WIN
-
-Symbol: ${trade.symbol}
-Direction: BUY
-Entry: ${trade.entry}
-Stop: ${trade.stop}
-TP: ${trade.tp}
-RR: +${trade.rr}R
-
-Signal Time: ${trade.openTime}
-Close Time: ${trade.closeTime}
-`);
+          resolved = true;
         }
 
         else if (currentPrice <= trade.stop) {
-
           trade.result = "LOSS";
-          trade.closeTime = new Date().toISOString();
-          updated = true;
-
-          await sendTelegram(`
-❌ ${repo.label} LOSS
-
-Symbol: ${trade.symbol}
-Direction: BUY
-Entry: ${trade.entry}
-Stop: ${trade.stop}
-TP: ${trade.tp}
-RR: -1R
-
-Signal Time: ${trade.openTime}
-Close Time: ${trade.closeTime}
-`);
+          resolved = true;
         }
       }
 
       if (trade.direction === "SELL") {
 
         if (currentPrice <= trade.tp) {
-
           trade.result = "WIN";
-          trade.closeTime = new Date().toISOString();
-          updated = true;
-
-          await sendTelegram(`
-✅ ${repo.label} WIN
-
-Symbol: ${trade.symbol}
-Direction: SELL
-Entry: ${trade.entry}
-Stop: ${trade.stop}
-TP: ${trade.tp}
-RR: +${trade.rr}R
-
-Signal Time: ${trade.openTime}
-Close Time: ${trade.closeTime}
-`);
+          resolved = true;
         }
 
         else if (currentPrice >= trade.stop) {
-
           trade.result = "LOSS";
-          trade.closeTime = new Date().toISOString();
-          updated = true;
+          resolved = true;
+        }
+      }
 
-          await sendTelegram(`
-❌ ${repo.label} LOSS
+      if (resolved) {
+
+        trade.closeTime = new Date().toISOString();
+        updated = true;
+
+        await sendTelegram(`
+${trade.result === "WIN" ? "✅" : "❌"} ${repo.label} ${trade.result}
 
 Symbol: ${trade.symbol}
-Direction: SELL
+Direction: ${trade.direction}
 Entry: ${trade.entry}
 Stop: ${trade.stop}
 TP: ${trade.tp}
-RR: -1R
+RR: ${trade.result === "WIN" ? "+" + trade.rr : "-1"}R
 
 Signal Time: ${trade.openTime}
 Close Time: ${trade.closeTime}
 `);
-        }
       }
     }
 
@@ -245,6 +204,79 @@ Close Time: ${trade.closeTime}
   }
 }
 
+/* ---------------- SUMMARY ENGINE ---------------- */
+
+async function runSummary(daysBack, title) {
+
+  let reportText = `📊 OmniSight ${title}\n\n`;
+
+  const now = new Date();
+  const cutoff = new Date();
+  cutoff.setDate(now.getDate() - daysBack);
+
+  let totalWins = 0;
+  let totalLosses = 0;
+  let totalTrades = 0;
+  let totalNetR = 0;
+
+  for (const repo of REPOS) {
+
+    const file = await getFile(repo.name);
+    if (!file) continue;
+
+    const trades = file.data;
+
+    const periodTrades = trades.filter(t =>
+      t.result &&
+      new Date(t.closeTime) >= cutoff
+    );
+
+    const wins = periodTrades.filter(t => t.result === "WIN").length;
+    const losses = periodTrades.filter(t => t.result === "LOSS").length;
+    const repoTotal = periodTrades.length;
+
+    const repoNetR =
+      periodTrades.reduce((sum, t) =>
+        sum + (t.result === "WIN" ? t.rr : -1), 0);
+
+    if (repoTotal > 0) {
+
+      const winRate = ((wins / repoTotal) * 100).toFixed(1);
+
+      reportText += `
+${repo.label}
+Trades: ${repoTotal}
+Wins: ${wins}
+Losses: ${losses}
+Win Rate: ${winRate}%
+Net R: ${repoNetR > 0 ? "+" : ""}${repoNetR}R
+
+`;
+    }
+
+    totalWins += wins;
+    totalLosses += losses;
+    totalTrades += repoTotal;
+    totalNetR += repoNetR;
+  }
+
+  const overallWinRate =
+    totalTrades > 0 ? ((totalWins / totalTrades) * 100).toFixed(1) : 0;
+
+  reportText += `
+──────────────
+Combined Portfolio
+
+Trades: ${totalTrades}
+Wins: ${totalWins}
+Losses: ${totalLosses}
+Win Rate: ${overallWinRate}%
+Net R: ${totalNetR > 0 ? "+" : ""}${totalNetR}R
+`;
+
+  await sendTelegram(reportText);
+}
+
 /* ---------------- MAIN ---------------- */
 
 (async () => {
@@ -253,6 +285,14 @@ Close Time: ${trade.closeTime}
 
   if (MODE === "scan") {
     await runScanner();
+  }
+
+  else if (MODE === "weekly") {
+    await runSummary(7, "Weekly Report");
+  }
+
+  else if (MODE === "monthly") {
+    await runSummary(30, "Monthly Report");
   }
 
 })();
