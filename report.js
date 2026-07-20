@@ -140,38 +140,24 @@ async function runScanner() {
 
     for (let trade of trades) {
 
-      if (!trade.id) continue; // safety
+      if (!trade.id) continue;
       if (tracker.processed.includes(trade.id)) continue;
       if (trade.result !== null) continue;
 
       const currentPrice = await getCurrentPrice(trade.symbol);
-
       let resolved = false;
 
       if (trade.direction === "BUY") {
-        if (currentPrice >= trade.tp) {
-          trade.result = "WIN";
-          resolved = true;
-        }
-        else if (currentPrice <= trade.stop) {
-          trade.result = "LOSS";
-          resolved = true;
-        }
+        if (currentPrice >= trade.tp) trade.result = "WIN";
+        else if (currentPrice <= trade.stop) trade.result = "LOSS";
       }
 
       if (trade.direction === "SELL") {
-        if (currentPrice <= trade.tp) {
-          trade.result = "WIN";
-          resolved = true;
-        }
-        else if (currentPrice >= trade.stop) {
-          trade.result = "LOSS";
-          resolved = true;
-        }
+        if (currentPrice <= trade.tp) trade.result = "WIN";
+        else if (currentPrice >= trade.stop) trade.result = "LOSS";
       }
 
-      if (resolved) {
-
+      if (trade.result) {
         trade.closeTime = new Date().toISOString();
         updated = true;
 
@@ -204,12 +190,112 @@ Close Time: ${trade.closeTime}
   saveTrackerState(tracker);
 }
 
+/* ---------------- SUMMARY ENGINE ---------------- */
+
+async function runSummary(daysBack, title) {
+
+  let reportText = `📊 OmniSight ${title}\n\n`;
+
+  const now = new Date();
+  const cutoff = new Date();
+  cutoff.setDate(now.getDate() - daysBack);
+
+  let repoStats = [];
+  let totalWins = 0;
+  let totalLosses = 0;
+  let totalTrades = 0;
+  let totalNetR = 0;
+
+  for (const repo of REPOS) {
+
+    const file = await getFile(repo.name);
+    if (!file) continue;
+
+    const trades = file.data;
+
+    const periodTrades = trades.filter(t =>
+      t.result &&
+      new Date(t.closeTime) >= cutoff
+    );
+
+    const wins = periodTrades.filter(t => t.result === "WIN").length;
+    const losses = periodTrades.filter(t => t.result === "LOSS").length;
+    const repoTotal = periodTrades.length;
+
+    const repoNetR =
+      periodTrades.reduce((sum, t) =>
+        sum + (t.result === "WIN" ? t.rr : -1), 0);
+
+    if (repoTotal > 0) {
+      repoStats.push({
+        name: repo.label,
+        total: repoTotal,
+        wins,
+        losses,
+        netR: repoNetR
+      });
+    }
+
+    totalWins += wins;
+    totalLosses += losses;
+    totalTrades += repoTotal;
+    totalNetR += repoNetR;
+  }
+
+  repoStats.sort((a, b) => b.netR - a.netR);
+
+  repoStats.forEach(r => {
+    const winRate = ((r.wins / r.total) * 100).toFixed(1);
+
+    reportText += `
+${r.name}
+Trades: ${r.total}
+Wins: ${r.wins}
+Losses: ${r.losses}
+Win Rate: ${winRate}%
+Net R: ${r.netR > 0 ? "+" : ""}${r.netR}R
+
+`;
+  });
+
+  const overallWinRate =
+    totalTrades > 0 ? ((totalWins / totalTrades) * 100).toFixed(1) : 0;
+
+  reportText += `
+──────────────
+📈 Combined Portfolio
+
+Trades: ${totalTrades}
+Wins: ${totalWins}
+Losses: ${totalLosses}
+Win Rate: ${overallWinRate}%
+Net R: ${totalNetR > 0 ? "+" : ""}${totalNetR}R
+`;
+
+  if (repoStats.length > 0) {
+    reportText += `
+🏆 Best: ${repoStats[0].name}
+📉 Worst: ${repoStats[repoStats.length - 1].name}
+`;
+  }
+
+  await sendTelegram(reportText);
+}
+
 /* ---------------- MAIN ---------------- */
 
 (async () => {
 
   if (MODE === "scan") {
     await runScanner();
+  }
+
+  else if (MODE === "weekly") {
+    await runSummary(7, "Weekly Report");
+  }
+
+  else if (MODE === "monthly") {
+    await runSummary(30, "Monthly Report");
   }
 
 })();
