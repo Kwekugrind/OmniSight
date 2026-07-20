@@ -9,12 +9,13 @@ const MODE = process.env.MODE || "scan";
 
 const OWNER = "Kwekugrind";
 
+/* ✅ EXACT REPO NAMES (CASE-SENSITIVE) */
 const REPOS = [
   { name: "coffee", label: "Coffee Machine" },
-  { name: "tea-machine", label: "Tea Machine" },
-  { name: "milk-machine", label: "Milk Machine" },
-  { name: "ice-cream-machine", label: "Ice Cream Machine" },
-  { name: "lerys-elite-alerts", label: "Lery's Elite Alerts" }
+  { name: "Tea", label: "Tea Machine" },
+  { name: "Milk", label: "Milk Machine" },
+  { name: "ice-cream", label: "Ice Cream Machine" },
+  { name: "Lery-s-Alerts", label: "Lery's Elite Alerts" }
 ];
 
 const FILE_PATH = "trades.json";
@@ -32,7 +33,10 @@ async function getFile(repo) {
     }
   });
 
-  if (res.status !== 200) return null;
+  if (res.status !== 200) {
+    console.log(`Could not read trades.json from ${repo} (status ${res.status})`);
+    return null;
+  }
 
   const data = await res.json();
   const content = Buffer.from(data.content, "base64").toString("utf-8");
@@ -68,6 +72,11 @@ async function getCurrentPrice(symbol) {
 
   return new Promise((resolve, reject) => {
 
+    const timeout = setTimeout(() => {
+      ws.terminate();
+      reject("Price fetch timeout");
+    }, 10000);
+
     ws.on("open", () => {
       ws.send(JSON.stringify({
         ticks_history: symbol,
@@ -80,20 +89,23 @@ async function getCurrentPrice(symbol) {
       const response = JSON.parse(data);
 
       if (response.history && response.history.prices) {
+        clearTimeout(timeout);
         const price = parseFloat(response.history.prices[0]);
-        resolve(price);
         ws.close();
+        resolve(price);
       }
 
       if (response.error) {
-        reject(response.error.message);
+        clearTimeout(timeout);
         ws.close();
+        reject(response.error.message);
       }
     });
 
     ws.on("error", (err) => {
-      reject(err);
+      clearTimeout(timeout);
       ws.close();
+      reject(err);
     });
   });
 }
@@ -117,6 +129,8 @@ async function runScanner() {
 
   for (const repo of REPOS) {
 
+    console.log(`Checking ${repo.label}`);
+
     const file = await getFile(repo.name);
     if (!file) continue;
 
@@ -129,7 +143,6 @@ async function runScanner() {
 
         const currentPrice = await getCurrentPrice(trade.symbol);
 
-        console.log(`Checking ${repo.label}`);
         console.log(`Current Price: ${currentPrice}`);
         console.log(`TP: ${trade.tp} | SL: ${trade.stop}`);
 
@@ -141,7 +154,7 @@ async function runScanner() {
             trade.closeTime = new Date().toISOString();
             updated = true;
 
-            const message = `
+            await sendTelegram(`
 ✅ ${repo.label} WIN
 
 Symbol: ${trade.symbol}
@@ -153,9 +166,7 @@ RR: +${trade.rr}R
 
 Signal Time: ${trade.openTime}
 Close Time: ${trade.closeTime}
-`;
-
-            await sendTelegram(message);
+`);
           }
 
           else if (currentPrice <= trade.stop) {
@@ -164,7 +175,7 @@ Close Time: ${trade.closeTime}
             trade.closeTime = new Date().toISOString();
             updated = true;
 
-            const message = `
+            await sendTelegram(`
 ❌ ${repo.label} LOSS
 
 Symbol: ${trade.symbol}
@@ -176,9 +187,7 @@ RR: -1R
 
 Signal Time: ${trade.openTime}
 Close Time: ${trade.closeTime}
-`;
-
-            await sendTelegram(message);
+`);
           }
         }
 
@@ -190,7 +199,7 @@ Close Time: ${trade.closeTime}
             trade.closeTime = new Date().toISOString();
             updated = true;
 
-            const message = `
+            await sendTelegram(`
 ✅ ${repo.label} WIN
 
 Symbol: ${trade.symbol}
@@ -202,9 +211,7 @@ RR: +${trade.rr}R
 
 Signal Time: ${trade.openTime}
 Close Time: ${trade.closeTime}
-`;
-
-            await sendTelegram(message);
+`);
           }
 
           else if (currentPrice >= trade.stop) {
@@ -213,7 +220,7 @@ Close Time: ${trade.closeTime}
             trade.closeTime = new Date().toISOString();
             updated = true;
 
-            const message = `
+            await sendTelegram(`
 ❌ ${repo.label} LOSS
 
 Symbol: ${trade.symbol}
@@ -225,9 +232,7 @@ RR: -1R
 
 Signal Time: ${trade.openTime}
 Close Time: ${trade.closeTime}
-`;
-
-            await sendTelegram(message);
+`);
           }
         }
       }
