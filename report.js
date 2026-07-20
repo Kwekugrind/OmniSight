@@ -9,7 +9,7 @@ const MODE = process.env.MODE || "scan";
 
 const OWNER = "Kwekugrind";
 
-/* ✅ EXACT REPO NAMES (CASE-SENSITIVE) */
+/* ✅ EXACT REPO NAMES */
 const REPOS = [
   { name: "coffee", label: "Coffee Machine" },
   { name: "Tea", label: "Tea Machine" },
@@ -123,7 +123,7 @@ async function sendTelegram(message) {
   });
 }
 
-/* ---------------- SCAN MODE ---------------- */
+/* ---------------- SCAN MODE (AUTO RESOLVE) ---------------- */
 
 async function runScanner() {
 
@@ -139,22 +139,23 @@ async function runScanner() {
 
     for (let trade of trades) {
 
-      if (trade.result === null) {
+      // ✅ Prevent duplicate processing
+      if (trade.result !== null) continue;
 
-        const currentPrice = await getCurrentPrice(trade.symbol);
+      const currentPrice = await getCurrentPrice(trade.symbol);
 
-        console.log(`Current Price: ${currentPrice}`);
-        console.log(`TP: ${trade.tp} | SL: ${trade.stop}`);
+      console.log(`Current Price: ${currentPrice}`);
+      console.log(`TP: ${trade.tp} | SL: ${trade.stop}`);
 
-        if (trade.direction === "BUY") {
+      if (trade.direction === "BUY") {
 
-          if (currentPrice >= trade.tp) {
+        if (currentPrice >= trade.tp) {
 
-            trade.result = "WIN";
-            trade.closeTime = new Date().toISOString();
-            updated = true;
+          trade.result = "WIN";
+          trade.closeTime = new Date().toISOString();
+          updated = true;
 
-            await sendTelegram(`
+          await sendTelegram(`
 ✅ ${repo.label} WIN
 
 Symbol: ${trade.symbol}
@@ -167,39 +168,39 @@ RR: +${trade.rr}R
 Signal Time: ${trade.openTime}
 Close Time: ${trade.closeTime}
 `);
-          }
-
-          else if (currentPrice <= trade.stop) {
-
-            trade.result = "LOSS";
-            trade.closeTime = new Date().toISOString();
-            updated = true;
-
-            await sendTelegram(`
-❌ ${repo.label} LOSS
-
-Symbol: ${trade.symbol}
-Direction: BUY
-Entry: ${trade.entry}
-Stop: ${trade.stop}
-TP: ${trade.tp}
-RR: -1R
-
-Signal Time: ${trade.openTime}
-Close Time: ${trade.closeTime}
-`);
-          }
         }
 
-        if (trade.direction === "SELL") {
+        else if (currentPrice <= trade.stop) {
 
-          if (currentPrice <= trade.tp) {
+          trade.result = "LOSS";
+          trade.closeTime = new Date().toISOString();
+          updated = true;
 
-            trade.result = "WIN";
-            trade.closeTime = new Date().toISOString();
-            updated = true;
+          await sendTelegram(`
+❌ ${repo.label} LOSS
 
-            await sendTelegram(`
+Symbol: ${trade.symbol}
+Direction: BUY
+Entry: ${trade.entry}
+Stop: ${trade.stop}
+TP: ${trade.tp}
+RR: -1R
+
+Signal Time: ${trade.openTime}
+Close Time: ${trade.closeTime}
+`);
+        }
+      }
+
+      if (trade.direction === "SELL") {
+
+        if (currentPrice <= trade.tp) {
+
+          trade.result = "WIN";
+          trade.closeTime = new Date().toISOString();
+          updated = true;
+
+          await sendTelegram(`
 ✅ ${repo.label} WIN
 
 Symbol: ${trade.symbol}
@@ -212,15 +213,15 @@ RR: +${trade.rr}R
 Signal Time: ${trade.openTime}
 Close Time: ${trade.closeTime}
 `);
-          }
+        }
 
-          else if (currentPrice >= trade.stop) {
+        else if (currentPrice >= trade.stop) {
 
-            trade.result = "LOSS";
-            trade.closeTime = new Date().toISOString();
-            updated = true;
+          trade.result = "LOSS";
+          trade.closeTime = new Date().toISOString();
+          updated = true;
 
-            await sendTelegram(`
+          await sendTelegram(`
 ❌ ${repo.label} LOSS
 
 Symbol: ${trade.symbol}
@@ -233,13 +234,13 @@ RR: -1R
 Signal Time: ${trade.openTime}
 Close Time: ${trade.closeTime}
 `);
-          }
         }
       }
     }
 
     if (updated) {
       await updateFile(repo.name, trades, file.sha);
+      console.log(`Updated trades for ${repo.label}`);
     }
   }
 }
