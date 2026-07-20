@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import fs from "fs";
+import WebSocket from "ws";
 
 const GITHUB_TOKEN = process.env.GH_TOKEN;
 const TELEGRAM_TOKEN = process.env.TG_BOT_TOKEN;
@@ -62,7 +63,7 @@ async function updateFile(repo, content, sha) {
 /* ---------------- GET CURRENT PRICE ---------------- */
 
 async function getCurrentPrice(symbol) {
-  const ws = new (await import("ws")).default("wss://ws.binaryws.com/websockets/v3?app_id=1089");
+  const ws = new WebSocket("wss://ws.binaryws.com/websockets/v3?app_id=1089");
 
   return new Promise((resolve, reject) => {
 
@@ -76,14 +77,21 @@ async function getCurrentPrice(symbol) {
 
     ws.on("message", (data) => {
       const response = JSON.parse(data);
-      if (response.candles) {
-        resolve(parseFloat(response.candles[0].close));
+
+      if (response.history && response.history.prices) {
+        resolve(parseFloat(response.history.prices[0]));
         ws.close();
       }
+
       if (response.error) {
         reject(response.error.message);
         ws.close();
       }
+    });
+
+    ws.on("error", (err) => {
+      reject(err);
+      ws.close();
     });
   });
 }
@@ -101,7 +109,7 @@ async function sendTelegram(message) {
   });
 }
 
-/* ---------------- SCAN MODE ---------------- */
+/* ---------------- SCAN MODE (AUTO RESOLVE) ---------------- */
 
 async function runScanner() {
 
@@ -165,7 +173,7 @@ async function runScanner() {
   }
 }
 
-/* ---------------- SUMMARY ---------------- */
+/* ---------------- SUMMARY ENGINE ---------------- */
 
 async function runSummary(daysBack, title) {
 
