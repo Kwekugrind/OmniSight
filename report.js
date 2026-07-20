@@ -20,6 +20,19 @@ const REPOS = [
 const FILE_PATH = "trades.json";
 const BRANCH = "main";
 
+/* ---------------- TRACKER MEMORY ---------------- */
+
+function loadTrackerState() {
+  if (!fs.existsSync("tracker_state.json")) {
+    return { processed: [], counter: 1 };
+  }
+  return JSON.parse(fs.readFileSync("tracker_state.json"));
+}
+
+function saveTrackerState(state) {
+  fs.writeFileSync("tracker_state.json", JSON.stringify(state, null, 2));
+}
+
 /* ---------------- FETCH FILE ---------------- */
 
 async function getFile(repo) {
@@ -32,10 +45,7 @@ async function getFile(repo) {
     }
   });
 
-  if (res.status !== 200) {
-    console.log(`Could not read trades.json from ${repo} (status ${res.status})`);
-    return null;
-  }
+  if (res.status !== 200) return null;
 
   const data = await res.json();
   const content = Buffer.from(data.content, "base64").toString("utf-8");
@@ -66,14 +76,13 @@ async function updateFile(repo, content, sha) {
 /* ---------------- GET CURRENT PRICE ---------------- */
 
 async function getCurrentPrice(symbol) {
-
   const ws = new WebSocket("wss://ws.binaryws.com/websockets/v3?app_id=1089");
 
   return new Promise((resolve, reject) => {
 
     const timeout = setTimeout(() => {
       ws.terminate();
-      reject("Price fetch timeout");
+      reject("Timeout");
     }, 10000);
 
     ws.on("open", () => {
@@ -89,22 +98,15 @@ async function getCurrentPrice(symbol) {
 
       if (response.history && response.history.prices) {
         clearTimeout(timeout);
-        const price = parseFloat(response.history.prices[0]);
+        resolve(parseFloat(response.history.prices[0]));
         ws.close();
-        resolve(price);
       }
 
       if (response.error) {
         clearTimeout(timeout);
-        ws.close();
         reject(response.error.message);
+        ws.close();
       }
-    });
-
-    ws.on("error", (err) => {
-      clearTimeout(timeout);
-      ws.close();
-      reject(err);
     });
   });
 }
@@ -122,40 +124,35 @@ async function sendTelegram(message) {
   });
 }
 
-/* ---------------- SCAN MODE (DUPLICATE-PROOF) ---------------- */
+/* ---------------- SCAN MODE ---------------- */
 
 async function runScanner() {
 
-  for (const repo of REPOS) {
+  const tracker = loadTrackerState();
 
-    console.log(`Checking ${repo.label}`);
+  for (const repo of REPOS) {
 
     const file = await getFile(repo.name);
     if (!file) continue;
 
     let trades = file.data;
+    let updated = false;
 
-    for (let i = 0; i < trades.length; i++) {
+    for (let trade of trades) {
 
-      let trade = trades[i];
-
-      // ✅ Skip already resolved trades
+      if (!trade.id) continue; // safety
+      if (tracker.processed.includes(trade.id)) continue;
       if (trade.result !== null) continue;
 
       const currentPrice = await getCurrentPrice(trade.symbol);
 
-      console.log(`Current Price: ${currentPrice}`);
-      console.log(`TP: ${trade.tp} | SL: ${trade.stop}`);
-
       let resolved = false;
 
       if (trade.direction === "BUY") {
-
         if (currentPrice >= trade.tp) {
           trade.result = "WIN";
           resolved = true;
         }
-
         else if (currentPrice <= trade.stop) {
           trade.result = "LOSS";
           resolved = true;
@@ -163,12 +160,10 @@ async function runScanner() {
       }
 
       if (trade.direction === "SELL") {
-
         if (currentPrice <= trade.tp) {
           trade.result = "WIN";
           resolved = true;
         }
-
         else if (currentPrice >= trade.stop) {
           trade.result = "LOSS";
           resolved = true;
@@ -178,12 +173,14 @@ async function runScanner() {
       if (resolved) {
 
         trade.closeTime = new Date().toISOString();
+        updated = true;
 
-        await updateFile(repo.name, trades, file.sha);
+        const tradeNumber = tracker.counter++;
 
         await sendTelegram(`
-${trade.result === "WIN" ? "✅" : "❌"} ${repo.label} ${trade.result}
+${trade.result === "WIN" ? "✅" : "❌"} Trade #${tradeNumber}
 
+Repo: ${repo.label}
 Symbol: ${trade.symbol}
 Direction: ${trade.direction}
 Entry: ${trade.entry}
@@ -195,102 +192,24 @@ Signal Time: ${trade.openTime}
 Close Time: ${trade.closeTime}
 `);
 
-        // ✅ Stop processing this repo after first update
-        break;
+        tracker.processed.push(trade.id);
       }
     }
-  }
-}
 
-/* ---------------- WEEKLY & MONTHLY SUMMARY ---------------- */
-
-async function runSummary(daysBack, title) {
-
-  let reportText = `📊 OmniSight ${title}\n\n`;
-
-  const now = new Date();
-  const cutoff = new Date();
-  cutoff.setDate(now.getDate() - daysBack);
-
-  let totalWins = 0;
-  let totalLosses = 0;
-  let totalTrades = 0;
-  let totalNetR = 0;
-
-  for (const repo of REPOS) {
-
-    const file = await getFile(repo.name);
-    if (!file) continue;
-
-    const trades = file.data;
-
-    const periodTrades = trades.filter(t =>
-      t.result &&
-      new Date(t.closeTime) >= cutoff
-    );
-
-    const wins = periodTrades.filter(t => t.result === "WIN").length;
-    const losses = periodTrades.filter(t => t.result === "LOSS").length;
-    const repoTotal = periodTrades.length;
-
-    const repoNetR =
-      periodTrades.reduce((sum, t) =>
-        sum + (t.result === "WIN" ? t.rr : -1), 0);
-
-    if (repoTotal > 0) {
-
-      const winRate = ((wins / repoTotal) * 100).toFixed(1);
-
-      reportText += `
-${repo.label}
-Trades: ${repoTotal}
-Wins: ${wins}
-Losses: ${losses}
-Win Rate: ${winRate}%
-Net R: ${repoNetR > 0 ? "+" : ""}${repoNetR}R
-
-`;
+    if (updated) {
+      await updateFile(repo.name, trades, file.sha);
     }
-
-    totalWins += wins;
-    totalLosses += losses;
-    totalTrades += repoTotal;
-    totalNetR += repoNetR;
   }
 
-  const overallWinRate =
-    totalTrades > 0 ? ((totalWins / totalTrades) * 100).toFixed(1) : 0;
-
-  reportText += `
-──────────────
-Combined Portfolio
-
-Trades: ${totalTrades}
-Wins: ${totalWins}
-Losses: ${totalLosses}
-Win Rate: ${overallWinRate}%
-Net R: ${totalNetR > 0 ? "+" : ""}${totalNetR}R
-`;
-
-  await sendTelegram(reportText);
+  saveTrackerState(tracker);
 }
 
 /* ---------------- MAIN ---------------- */
 
 (async () => {
 
-  console.log("MODE:", MODE);
-
   if (MODE === "scan") {
     await runScanner();
-  }
-
-  else if (MODE === "weekly") {
-    await runSummary(7, "Weekly Report");
-  }
-
-  else if (MODE === "monthly") {
-    await runSummary(30, "Monthly Report");
   }
 
 })();
