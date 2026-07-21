@@ -20,6 +20,19 @@ const REPOS = [
 const FILE_PATH = "trades.json";
 const BRANCH = "main";
 
+/* ---------------- SYMBOL DISPLAY NAMES ---------------- */
+
+function getSymbolDisplay(symbol) {
+  switch (symbol) {
+    case "R_10": return "📊 VOLATILITY 10";
+    case "R_25": return "📊 VOLATILITY 25";
+    case "R_50": return "📊 VOLATILITY 50";
+    case "R_75": return "📊 VOLATILITY 75";
+    case "stpRNG": return "📊 STEP INDEX";
+    default: return symbol;
+  }
+}
+
 /* ---------------- TRACKER MEMORY ---------------- */
 
 function loadTrackerState() {
@@ -111,6 +124,54 @@ async function getCurrentPrice(symbol) {
   });
 }
 
+/* ---------------- GET M5 MACD ---------------- */
+
+async function getM5MACD(symbol) {
+
+  const ws = new WebSocket("wss://ws.binaryws.com/websockets/v3?app_id=1089");
+
+  return new Promise((resolve, reject) => {
+
+    ws.on("open", () => {
+      ws.send(JSON.stringify({
+        ticks_history: symbol,
+        count: 200,
+        granularity: 300,
+        end: "latest",
+        style: "candles"
+      }));
+    });
+
+    ws.on("message", (data) => {
+      const response = JSON.parse(data);
+
+      if (response.candles) {
+        const closes = response.candles.map(c => parseFloat(c.close));
+
+        const ema = (data, length) => {
+          let k = 2 / (length + 1);
+          let emaArr = [];
+          emaArr[0] = data[0];
+          for (let i = 1; i < data.length; i++) {
+            emaArr[i] = data[i] * k + emaArr[i - 1] * (1 - k);
+          }
+          return emaArr;
+        };
+
+        const emaFast = ema(closes, 4);
+        const emaSlow = ema(closes, 34);
+
+        const macd = emaFast[emaFast.length - 2] - emaSlow[emaSlow.length - 2]; // ✅ closed candle
+
+        resolve(macd);
+        ws.close();
+      }
+    });
+
+    ws.on("error", reject);
+  });
+}
+
 /* ---------------- TELEGRAM ---------------- */
 
 async function sendTelegram(message) {
@@ -140,12 +201,46 @@ async function runScanner() {
 
     for (let trade of trades) {
 
+      /* ---------- MACD WARNING ---------- */
+
+      if (trade.result === null && trade.warningSent !== true) {
+
+        const macd = await getM5MACD(trade.symbol);
+        const currentPrice = await getCurrentPrice(trade.symbol);
+
+        let shouldWarn = false;
+
+        if (trade.direction === "BUY" && macd < 0) shouldWarn = true;
+        if (trade.direction === "SELL" && macd > 0) shouldWarn = true;
+
+        if (shouldWarn) {
+
+          await sendTelegram(`
+⚠⚠⚠ CLOSE ${trade.direction} TRADE NOW ⚠⚠⚠
+
+Repo: ${repo.label}
+Symbol: ${getSymbolDisplay(trade.symbol)}
+Direction: ${trade.direction}
+Entry: ${trade.entry}
+Current Price: ${currentPrice}
+
+MACD (M5) is ${macd < 0 ? "below" : "above"} zero.
+
+EXIT IMMEDIATELY.
+`);
+
+          trade.warningSent = true;
+          updated = true;
+        }
+      }
+
+      /* ---------- TP/SL RESOLUTION ---------- */
+
       if (!trade.id) continue;
       if (tracker.processed.includes(trade.id)) continue;
       if (trade.result !== null) continue;
 
       const currentPrice = await getCurrentPrice(trade.symbol);
-      let resolved = false;
 
       if (trade.direction === "BUY") {
         if (currentPrice >= trade.tp) trade.result = "WIN";
@@ -158,6 +253,7 @@ async function runScanner() {
       }
 
       if (trade.result) {
+
         trade.closeTime = new Date().toISOString();
         updated = true;
 
@@ -167,7 +263,7 @@ async function runScanner() {
 ${trade.result === "WIN" ? "✅" : "❌"} Trade #${tradeNumber}
 
 Repo: ${repo.label}
-Symbol: ${trade.symbol}
+Symbol: ${getSymbolDisplay(trade.symbol)}
 Direction: ${trade.direction}
 Entry: ${trade.entry}
 Stop: ${trade.stop}
@@ -200,7 +296,6 @@ async function runSummary(daysBack, title) {
   const cutoff = new Date();
   cutoff.setDate(now.getDate() - daysBack);
 
-  let repoStats = [];
   let totalWins = 0;
   let totalLosses = 0;
   let totalTrades = 0;
@@ -227,13 +322,17 @@ async function runSummary(daysBack, title) {
         sum + (t.result === "WIN" ? t.rr : -1), 0);
 
     if (repoTotal > 0) {
-      repoStats.push({
-        name: repo.label,
-        total: repoTotal,
-        wins,
-        losses,
-        netR: repoNetR
-      });
+      const winRate = ((wins / repoTotal) * 100).toFixed(1);
+
+      reportText += `
+${repo.label}
+Trades: ${repoTotal}
+Wins: ${wins}
+Losses: ${losses}
+Win Rate: ${winRate}%
+Net R: ${repoNetR > 0 ? "+" : ""}${repoNetR}R
+
+`;
     }
 
     totalWins += wins;
@@ -241,22 +340,6 @@ async function runSummary(daysBack, title) {
     totalTrades += repoTotal;
     totalNetR += repoNetR;
   }
-
-  repoStats.sort((a, b) => b.netR - a.netR);
-
-  repoStats.forEach(r => {
-    const winRate = ((r.wins / r.total) * 100).toFixed(1);
-
-    reportText += `
-${r.name}
-Trades: ${r.total}
-Wins: ${r.wins}
-Losses: ${r.losses}
-Win Rate: ${winRate}%
-Net R: ${r.netR > 0 ? "+" : ""}${r.netR}R
-
-`;
-  });
 
   const overallWinRate =
     totalTrades > 0 ? ((totalWins / totalTrades) * 100).toFixed(1) : 0;
@@ -271,13 +354,6 @@ Losses: ${totalLosses}
 Win Rate: ${overallWinRate}%
 Net R: ${totalNetR > 0 ? "+" : ""}${totalNetR}R
 `;
-
-  if (repoStats.length > 0) {
-    reportText += `
-🏆 Best: ${repoStats[0].name}
-📉 Worst: ${repoStats[repoStats.length - 1].name}
-`;
-  }
 
   await sendTelegram(reportText);
 }
