@@ -53,12 +53,16 @@ async function getFile(repo) {
   return { data: JSON.parse(content), sha: data.sha };
 }
 
-/* ---------------- UPDATE FILE ---------------- */
+/* ---------------- SAFE UPDATE FILE ---------------- */
 
-async function updateFile(repo, content, sha) {
+async function updateFile(repo, content) {
+
+  const fresh = await getFile(repo);
+  if (!fresh) return;
+
   const url = `https://api.github.com/repos/${OWNER}/${repo}/contents/${FILE_PATH}`;
 
-  await fetch(url, {
+  const res = await fetch(url, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${GITHUB_TOKEN}`,
@@ -67,15 +71,21 @@ async function updateFile(repo, content, sha) {
     body: JSON.stringify({
       message: "Update trade results",
       content: Buffer.from(JSON.stringify(content, null, 2)).toString("base64"),
-      sha: sha,
+      sha: fresh.sha,
       branch: BRANCH
     })
   });
+
+  if (!res.ok) {
+    const text = await res.text();
+    console.log("Update failed:", text);
+  }
 }
 
 /* ---------------- GET CURRENT PRICE ---------------- */
 
 async function getCurrentPrice(symbol) {
+
   const ws = new WebSocket("wss://ws.binaryws.com/websockets/v3?app_id=1089");
 
   return new Promise((resolve, reject) => {
@@ -216,7 +226,7 @@ EXIT IMMEDIATELY.
 `);
 
           trade.warningSent = true;
-          updated = true;   // ✅ critical fix
+          updated = true;
         }
       }
 
@@ -253,81 +263,9 @@ RR: ${trade.result === "WIN" ? "+" + trade.rr : "-1"}R
     }
 
     if (updated) {
-      await updateFile(repo.name, trades, file.sha);
+      await updateFile(repo.name, trades);
     }
   }
-}
-
-/* ---------------- SUMMARY ENGINE ---------------- */
-
-async function runSummary(daysBack, title) {
-
-  let reportText = `📊 OmniSight ${title}\n\n`;
-
-  const now = new Date();
-  const cutoff = new Date();
-  cutoff.setDate(now.getDate() - daysBack);
-
-  let totalWins = 0;
-  let totalLosses = 0;
-  let totalTrades = 0;
-  let totalNetR = 0;
-
-  for (const repo of REPOS) {
-
-    const file = await getFile(repo.name);
-    if (!file) continue;
-
-    const trades = file.data;
-
-    const periodTrades = trades.filter(t =>
-      t.result &&
-      new Date(t.closeTime) >= cutoff
-    );
-
-    const wins = periodTrades.filter(t => t.result === "WIN").length;
-    const losses = periodTrades.filter(t => t.result === "LOSS").length;
-    const repoTotal = periodTrades.length;
-
-    const repoNetR =
-      periodTrades.reduce((sum, t) =>
-        sum + (t.result === "WIN" ? t.rr : -1), 0);
-
-    if (repoTotal > 0) {
-      const winRate = ((wins / repoTotal) * 100).toFixed(1);
-
-      reportText += `
-${repo.label}
-Trades: ${repoTotal}
-Wins: ${wins}
-Losses: ${losses}
-Win Rate: ${winRate}%
-Net R: ${repoNetR > 0 ? "+" : ""}${repoNetR}R
-
-`;
-    }
-
-    totalWins += wins;
-    totalLosses += losses;
-    totalTrades += repoTotal;
-    totalNetR += repoNetR;
-  }
-
-  const overallWinRate =
-    totalTrades > 0 ? ((totalWins / totalTrades) * 100).toFixed(1) : 0;
-
-  reportText += `
-──────────────
-📈 Combined Portfolio
-
-Trades: ${totalTrades}
-Wins: ${totalWins}
-Losses: ${totalLosses}
-Win Rate: ${overallWinRate}%
-Net R: ${totalNetR > 0 ? "+" : ""}${totalNetR}R
-`;
-
-  await sendTelegram(reportText);
 }
 
 /* ---------------- MAIN ---------------- */
@@ -336,14 +274,6 @@ Net R: ${totalNetR > 0 ? "+" : ""}${totalNetR}R
 
   if (MODE === "scan") {
     await runScanner();
-  }
-
-  else if (MODE === "weekly") {
-    await runSummary(7, "Weekly Report");
-  }
-
-  else if (MODE === "monthly") {
-    await runSummary(30, "Monthly Report");
   }
 
 })();
