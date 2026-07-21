@@ -20,7 +20,7 @@ const REPOS = [
 const FILE_PATH = "trades.json";
 const BRANCH = "main";
 
-/* ---------------- SYMBOL DISPLAY NAMES ---------------- */
+/* ---------------- SYMBOL DISPLAY ---------------- */
 
 function getSymbolDisplay(symbol) {
   switch (symbol) {
@@ -31,19 +31,6 @@ function getSymbolDisplay(symbol) {
     case "stpRNG": return "📊 STEP INDEX";
     default: return symbol;
   }
-}
-
-/* ---------------- TRACKER MEMORY ---------------- */
-
-function loadTrackerState() {
-  if (!fs.existsSync("tracker_state.json")) {
-    return { processed: [], counter: 1 };
-  }
-  return JSON.parse(fs.readFileSync("tracker_state.json"));
-}
-
-function saveTrackerState(state) {
-  fs.writeFileSync("tracker_state.json", JSON.stringify(state, null, 2));
 }
 
 /* ---------------- FETCH FILE ---------------- */
@@ -146,6 +133,7 @@ async function getM5MACD(symbol) {
       const response = JSON.parse(data);
 
       if (response.candles) {
+
         const closes = response.candles.map(c => parseFloat(c.close));
 
         const ema = (data, length) => {
@@ -161,7 +149,7 @@ async function getM5MACD(symbol) {
         const emaFast = ema(closes, 4);
         const emaSlow = ema(closes, 34);
 
-        const macd = emaFast[emaFast.length - 2] - emaSlow[emaSlow.length - 2]; // ✅ closed candle
+        const macd = emaFast[emaFast.length - 2] - emaSlow[emaSlow.length - 2];
 
         resolve(macd);
         ws.close();
@@ -188,8 +176,6 @@ async function sendTelegram(message) {
 /* ---------------- SCAN MODE ---------------- */
 
 async function runScanner() {
-
-  const tracker = loadTrackerState();
 
   for (const repo of REPOS) {
 
@@ -230,51 +216,39 @@ EXIT IMMEDIATELY.
 `);
 
           trade.warningSent = true;
-          updated = true;
+          updated = true;   // ✅ critical fix
         }
       }
 
       /* ---------- TP/SL RESOLUTION ---------- */
 
-      if (!trade.id) continue;
-      if (tracker.processed.includes(trade.id)) continue;
-      if (trade.result !== null) continue;
+      if (trade.result === null) {
 
-      const currentPrice = await getCurrentPrice(trade.symbol);
+        const currentPrice = await getCurrentPrice(trade.symbol);
 
-      if (trade.direction === "BUY") {
-        if (currentPrice >= trade.tp) trade.result = "WIN";
-        else if (currentPrice <= trade.stop) trade.result = "LOSS";
-      }
+        if (trade.direction === "BUY") {
+          if (currentPrice >= trade.tp) trade.result = "WIN";
+          else if (currentPrice <= trade.stop) trade.result = "LOSS";
+        }
 
-      if (trade.direction === "SELL") {
-        if (currentPrice <= trade.tp) trade.result = "WIN";
-        else if (currentPrice >= trade.stop) trade.result = "LOSS";
-      }
+        if (trade.direction === "SELL") {
+          if (currentPrice <= trade.tp) trade.result = "WIN";
+          else if (currentPrice >= trade.stop) trade.result = "LOSS";
+        }
 
-      if (trade.result) {
+        if (trade.result) {
 
-        trade.closeTime = new Date().toISOString();
-        updated = true;
+          trade.closeTime = new Date().toISOString();
+          updated = true;
 
-        const tradeNumber = tracker.counter++;
+          await sendTelegram(`
+${trade.result === "WIN" ? "✅" : "❌"} ${repo.label}
 
-        await sendTelegram(`
-${trade.result === "WIN" ? "✅" : "❌"} Trade #${tradeNumber}
-
-Repo: ${repo.label}
 Symbol: ${getSymbolDisplay(trade.symbol)}
 Direction: ${trade.direction}
-Entry: ${trade.entry}
-Stop: ${trade.stop}
-TP: ${trade.tp}
 RR: ${trade.result === "WIN" ? "+" + trade.rr : "-1"}R
-
-Signal Time: ${trade.openTime}
-Close Time: ${trade.closeTime}
 `);
-
-        tracker.processed.push(trade.id);
+        }
       }
     }
 
@@ -282,8 +256,6 @@ Close Time: ${trade.closeTime}
       await updateFile(repo.name, trades, file.sha);
     }
   }
-
-  saveTrackerState(tracker);
 }
 
 /* ---------------- SUMMARY ENGINE ---------------- */
