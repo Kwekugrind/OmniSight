@@ -59,18 +59,19 @@ async function getFile(repo) {
 
 async function updateFile(repo, content) {
   const fresh = await getFile(repo);
-  if (!fresh) return;
+  if (!fresh) return false;
   const url = `https://api.github.com/repos/${OWNER}/${repo}/contents/${FILE_PATH}`;
-  await fetch(url, {
+  const res = await fetch(url, {
     method: "PUT",
     headers: { Authorization: `Bearer ${GITHUB_TOKEN}`, Accept: "application/vnd.github+json" },
     body: JSON.stringify({
-      message: "OmniSight: Update trade state",
+      message: "OmniSight: Close trade on MACD Warning (SL hit)",
       content: Buffer.from(JSON.stringify(content, null, 2)).toString("base64"),
       sha: fresh.sha,
       branch: BRANCH
     })
   });
+  return res.status === 200 || res.status === 201;
 }
 
 async function getCurrentPrice(symbol) {
@@ -131,41 +132,64 @@ async function runScanner() {
     for (let trade of trades) {
       if (trade.result !== null) continue;
 
-      // 1. OmniSight MACD Warning (Checks separate flag)
+      // 1. OmniSight MACD Warning -> Treated as immediate Stop Loss (LOSS) & Closed
       if (trade.warningSentOmni !== true) {
         const macd = await getM5MACD(trade.symbol);
         const price = await getCurrentPrice(trade.symbol);
+        
         if ((trade.direction === "BUY" && macd < 0) || (trade.direction === "SELL" && macd > 0)) {
-          await sendTelegram(`⚠⚠⚠ [OmniSight] CLOSE ${trade.direction} ${getSymbolDisplay(trade.symbol)} NOW\nEntry: ${trade.entry}\nPrice: ${price}\nMACD is ${macd < 0 ? 'Negative' : 'Positive'}`);
+          // Send warning/SL notice
+          await sendTelegram(`⚠⚠⚠ [OmniSight SL HIT] CLOSE ${trade.direction} ${getSymbolDisplay(trade.symbol)} NOW\nEntry: ${trade.entry}\nExit Price: ${price}\nMACD is ${macd < 0 ? 'Negative' : 'Positive'}\nResult: STOP LOSS (1.0R Loss)`);
+          
+          // Immediately close the trade as a LOSS
           trade.warningSentOmni = true;
+          trade.result = "LOSS";
+          trade.closeTime = new Date().toISOString();
+          
+          const num = tracker.counter++;
+          const tradeIdentifier = trade.id || `${trade.symbol}-${trade.openTime}`;
+          if (!tracker.processed.includes(tradeIdentifier)) {
+            tracker.processed.push(tradeIdentifier);
+          }
+          
           updated = true;
         }
       }
 
-      if (updated) break; 
+      // 2. Standard TP/SL Resolution Check (if warning didn't trigger it yet)
+      if (trade.result === null) {
+        const tradeIdentifier = trade.id || `${trade.symbol}-${trade.openTime}`;
+        if (!tracker.processed.includes(tradeIdentifier)) {
+          const price = await getCurrentPrice(trade.symbol);
+          if (trade.direction === "BUY") {
+            if (price >= trade.tp) trade.result = "WIN";
+            else if (price <= trade.stop) trade.result = "LOSS";
+          } else {
+            if (price <= trade.tp) trade.result = "WIN";
+            else if (price >= trade.stop) trade.result = "LOSS";
+          }
 
-      // 2. TP/SL Resolution
-      if (!tracker.processed.includes(trade.id)) {
-        const price = await getCurrentPrice(trade.symbol);
-        if (trade.direction === "BUY") {
-          if (price >= trade.tp) trade.result = "WIN";
-          else if (price <= trade.stop) trade.result = "LOSS";
-        } else {
-          if (price <= trade.tp) trade.result = "WIN";
-          else if (price >= trade.stop) trade.result = "LOSS";
+          if (trade.result) {
+            trade.closeTime = new Date().toISOString();
+            const num = tracker.counter++;
+            await sendTelegram(`${trade.result === "WIN" ? "✅" : "❌"} Trade #${num}\nRepo: ${repo.label}\nSymbol: ${getSymbolDisplay(trade.symbol)}\nResult: ${trade.result}\nRR: ${trade.result === "WIN" ? "+" + trade.rr : "-1"}R`);
+            tracker.processed.push(tradeIdentifier);
+            updated = true;
+          }
         }
+      }
 
-        if (trade.result) {
-          trade.closeTime = new Date().toISOString();
-          const num = tracker.counter++;
-          await sendTelegram(`${trade.result === "WIN" ? "✅" : "❌"} Trade #${num}\nRepo: ${repo.label}\nSymbol: ${getSymbolDisplay(trade.symbol)}\nResult: ${trade.result}\nRR: ${trade.result === "WIN" ? "+" + trade.rr : "-1"}R`);
-          if (trade.id) tracker.processed.push(trade.id);
-          updated = true;
-          break;
-        }
+      if (updated) break;
+    }
+
+    if (updated) {
+      const success = await updateFile(repo.name, trades);
+      if (success) {
+        console.log(`Successfully closed trade and committed state for ${repo.name}`);
+      } else {
+        console.error(`Failed to commit trade closure for ${repo.name}`);
       }
     }
-    if (updated) await updateFile(repo.name, trades);
   }
   saveTrackerState(tracker);
 }
