@@ -131,20 +131,20 @@ async function runScanner() {
     for (let trade of trades) {
       if (trade.result !== null) continue;
 
-      // 1. Check MACD Warning
-      if (!trade.warningSent) {
+      // 1. OmniSight MACD Warning (Checks separate flag)
+      if (trade.warningSentOmni !== true) {
         const macd = await getM5MACD(trade.symbol);
         const price = await getCurrentPrice(trade.symbol);
         if ((trade.direction === "BUY" && macd < 0) || (trade.direction === "SELL" && macd > 0)) {
-          await sendTelegram(`⚠⚠⚠ CLOSE ${trade.direction} ${getSymbolDisplay(trade.symbol)} NOW\nEntry: ${trade.entry}\nPrice: ${price}\nMACD is ${macd < 0 ? 'Negative' : 'Positive'}`);
-          trade.warningSent = true;
+          await sendTelegram(`⚠⚠⚠ [OmniSight] CLOSE ${trade.direction} ${getSymbolDisplay(trade.symbol)} NOW\nEntry: ${trade.entry}\nPrice: ${price}\nMACD is ${macd < 0 ? 'Negative' : 'Positive'}`);
+          trade.warningSentOmni = true;
           updated = true;
         }
       }
 
-      if (updated) break; // Save immediately after warning
+      if (updated) break; 
 
-      // 2. Check TP/SL
+      // 2. TP/SL Resolution
       if (!tracker.processed.includes(trade.id)) {
         const price = await getCurrentPrice(trade.symbol);
         if (trade.direction === "BUY") {
