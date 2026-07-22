@@ -5,7 +5,7 @@ import WebSocket from "ws";
 const GITHUB_TOKEN = process.env.GH_TOKEN;
 const TELEGRAM_TOKEN = process.env.TG_BOT_TOKEN;
 const TELEGRAM_CHAT = process.env.TG_CHAT_ID;
-const MODE = process.env.MODE || "scan";
+const MODE = process.env.MODE && process.env.MODE.trim() !== "" ? process.env.MODE.trim() : "scan";
 
 const OWNER = "Kwekugrind";
 
@@ -20,8 +20,6 @@ const REPOS = [
 const FILE_PATH = "trades.json";
 const BRANCH = "main";
 
-/* ---------------- SYMBOL DISPLAY ---------------- */
-
 function getSymbolDisplay(symbol) {
   switch (symbol) {
     case "R_10": return "📊 VOLATILITY 10";
@@ -33,56 +31,41 @@ function getSymbolDisplay(symbol) {
   }
 }
 
-/* ---------------- TRACKER MEMORY ---------------- */
-
 function loadTrackerState() {
   if (!fs.existsSync("tracker_state.json")) {
     return { processed: [], counter: 1 };
   }
-  return JSON.parse(fs.readFileSync("tracker_state.json"));
+  const state = JSON.parse(fs.readFileSync("tracker_state.json"));
+  if (!state.processed) state.processed = [];
+  if (!state.counter) state.counter = 1;
+  return state;
 }
 
 function saveTrackerState(state) {
+  state.processed = state.processed.filter(id => id !== null);
   fs.writeFileSync("tracker_state.json", JSON.stringify(state, null, 2));
 }
 
-/* ---------------- FETCH FILE ---------------- */
-
 async function getFile(repo) {
   const url = `https://api.github.com/repos/${OWNER}/${repo}/contents/${FILE_PATH}?ref=${BRANCH}`;
-
   const res = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${GITHUB_TOKEN}`,
-      Accept: "application/vnd.github+json"
-    }
+    headers: { Authorization: `Bearer ${GITHUB_TOKEN}`, Accept: "application/vnd.github+json" }
   });
-
   if (res.status !== 200) return null;
-
   const data = await res.json();
   const content = Buffer.from(data.content, "base64").toString("utf-8");
-
   return { data: JSON.parse(content), sha: data.sha };
 }
 
-/* ---------------- SAFE UPDATE FILE ---------------- */
-
 async function updateFile(repo, content) {
-
   const fresh = await getFile(repo);
   if (!fresh) return;
-
   const url = `https://api.github.com/repos/${OWNER}/${repo}/contents/${FILE_PATH}`;
-
   await fetch(url, {
     method: "PUT",
-    headers: {
-      Authorization: `Bearer ${GITHUB_TOKEN}`,
-      Accept: "application/vnd.github+json"
-    },
+    headers: { Authorization: `Bearer ${GITHUB_TOKEN}`, Accept: "application/vnd.github+json" },
     body: JSON.stringify({
-      message: "Update trade results",
+      message: "OmniSight: Update trade state",
       content: Buffer.from(JSON.stringify(content, null, 2)).toString("base64"),
       sha: fresh.sha,
       branch: BRANCH
@@ -90,272 +73,129 @@ async function updateFile(repo, content) {
   });
 }
 
-/* ---------------- PRICE ---------------- */
-
 async function getCurrentPrice(symbol) {
-
   const ws = new WebSocket("wss://ws.binaryws.com/websockets/v3?app_id=1089");
-
   return new Promise((resolve, reject) => {
-
-    ws.on("open", () => {
-      ws.send(JSON.stringify({
-        ticks_history: symbol,
-        count: 1,
-        end: "latest"
-      }));
-    });
-
+    const timeout = setTimeout(() => { ws.terminate(); reject("Timeout"); }, 10000);
+    ws.on("open", () => { ws.send(JSON.stringify({ ticks_history: symbol, count: 1, end: "latest" })); });
     ws.on("message", (data) => {
       const response = JSON.parse(data);
-
       if (response.history && response.history.prices) {
+        clearTimeout(timeout);
         resolve(parseFloat(response.history.prices[0]));
         ws.close();
       }
-
-      if (response.error) {
-        reject(response.error.message);
-        ws.close();
-      }
     });
-
-    ws.on("error", reject);
+    ws.on("error", (e) => { clearTimeout(timeout); reject(e); });
   });
 }
 
-/* ---------------- M5 MACD ---------------- */
-
 async function getM5MACD(symbol) {
-
   const ws = new WebSocket("wss://ws.binaryws.com/websockets/v3?app_id=1089");
-
   return new Promise((resolve, reject) => {
-
-    ws.on("open", () => {
-      ws.send(JSON.stringify({
-        ticks_history: symbol,
-        count: 200,
-        granularity: 300,
-        end: "latest",
-        style: "candles"
-      }));
-    });
-
+    ws.on("open", () => { ws.send(JSON.stringify({ ticks_history: symbol, count: 200, granularity: 300, end: "latest", style: "candles" })); });
     ws.on("message", (data) => {
       const response = JSON.parse(data);
-
       if (response.candles) {
-
         const closes = response.candles.map(c => parseFloat(c.close));
-
-        const ema = (data, length) => {
-          let k = 2 / (length + 1);
-          let arr = [];
-          arr[0] = data[0];
-          for (let i = 1; i < data.length; i++) {
-            arr[i] = data[i] * k + arr[i - 1] * (1 - k);
-          }
-          return arr;
+        const ema = (d, l) => {
+          let k = 2 / (l + 1), r = [d[0]];
+          for (let i = 1; i < d.length; i++) r[i] = d[i] * k + r[i - 1] * (1 - k);
+          return r;
         };
-
-        const emaFast = ema(closes, 4);
-        const emaSlow = ema(closes, 34);
-
-        const macd = emaFast[emaFast.length - 2] - emaSlow[emaSlow.length - 2];
-
+        const macd = ema(closes, 4)[closes.length - 2] - ema(closes, 34)[closes.length - 2];
         resolve(macd);
         ws.close();
       }
     });
-
     ws.on("error", reject);
   });
 }
-
-/* ---------------- TELEGRAM ---------------- */
 
 async function sendTelegram(message) {
   await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      chat_id: TELEGRAM_CHAT,
-      text: message
-    })
+    body: JSON.stringify({ chat_id: TELEGRAM_CHAT, text: message })
   });
 }
 
-/* ---------------- SCAN MODE ---------------- */
-
 async function runScanner() {
-
   const tracker = loadTrackerState();
-
   for (const repo of REPOS) {
-
     const file = await getFile(repo.name);
     if (!file) continue;
-
     let trades = file.data;
     let updated = false;
 
     for (let trade of trades) {
+      if (trade.result !== null) continue;
 
-      /* MACD WARNING */
-
-      if (trade.result === null && trade.warningSent !== true) {
-
+      // 1. Check MACD Warning
+      if (!trade.warningSent) {
         const macd = await getM5MACD(trade.symbol);
-        const currentPrice = await getCurrentPrice(trade.symbol);
-
-        if (
-          (trade.direction === "BUY" && macd < 0) ||
-          (trade.direction === "SELL" && macd > 0)
-        ) {
-
-          await sendTelegram(`
-⚠⚠⚠ CLOSE ${trade.direction} TRADE NOW ⚠⚠⚠
-
-Repo: ${repo.label}
-Symbol: ${getSymbolDisplay(trade.symbol)}
-Direction: ${trade.direction}
-Entry: ${trade.entry}
-Current Price: ${currentPrice}
-
-MACD (M5) is ${macd < 0 ? "below" : "above"} zero.
-
-EXIT IMMEDIATELY.
-`);
-
+        const price = await getCurrentPrice(trade.symbol);
+        if ((trade.direction === "BUY" && macd < 0) || (trade.direction === "SELL" && macd > 0)) {
+          await sendTelegram(`⚠⚠⚠ CLOSE ${trade.direction} ${getSymbolDisplay(trade.symbol)} NOW\nEntry: ${trade.entry}\nPrice: ${price}\nMACD is ${macd < 0 ? 'Negative' : 'Positive'}`);
           trade.warningSent = true;
           updated = true;
         }
       }
 
-      /* TP/SL */
+      if (updated) break; // Save immediately after warning
 
-      if (trade.result === null) {
-
-        const currentPrice = await getCurrentPrice(trade.symbol);
-
+      // 2. Check TP/SL
+      if (!tracker.processed.includes(trade.id)) {
+        const price = await getCurrentPrice(trade.symbol);
         if (trade.direction === "BUY") {
-          if (currentPrice >= trade.tp) trade.result = "WIN";
-          else if (currentPrice <= trade.stop) trade.result = "LOSS";
-        }
-
-        if (trade.direction === "SELL") {
-          if (currentPrice <= trade.tp) trade.result = "WIN";
-          else if (currentPrice >= trade.stop) trade.result = "LOSS";
+          if (price >= trade.tp) trade.result = "WIN";
+          else if (price <= trade.stop) trade.result = "LOSS";
+        } else {
+          if (price <= trade.tp) trade.result = "WIN";
+          else if (price >= trade.stop) trade.result = "LOSS";
         }
 
         if (trade.result) {
-
           trade.closeTime = new Date().toISOString();
+          const num = tracker.counter++;
+          await sendTelegram(`${trade.result === "WIN" ? "✅" : "❌"} Trade #${num}\nRepo: ${repo.label}\nSymbol: ${getSymbolDisplay(trade.symbol)}\nResult: ${trade.result}\nRR: ${trade.result === "WIN" ? "+" + trade.rr : "-1"}R`);
+          if (trade.id) tracker.processed.push(trade.id);
           updated = true;
-
-          const tradeNumber = tracker.counter++;
-
-          await sendTelegram(`
-${trade.result === "WIN" ? "✅" : "❌"} Trade #${tradeNumber}
-
-Repo: ${repo.label}
-Symbol: ${getSymbolDisplay(trade.symbol)}
-Direction: ${trade.direction}
-RR: ${trade.result === "WIN" ? "+" + trade.rr : "-1"}R
-`);
-
-          tracker.processed.push(trade.id);
+          break;
         }
       }
     }
-
-    if (updated) {
-      await updateFile(repo.name, trades);
-    }
+    if (updated) await updateFile(repo.name, trades);
   }
-
   saveTrackerState(tracker);
 }
 
-/* ---------------- SUMMARY ---------------- */
-
 async function runSummary(daysBack, title) {
-
   let reportText = `📊 OmniSight ${title}\n\n`;
-
-  const now = new Date();
   const cutoff = new Date();
-  cutoff.setDate(now.getDate() - daysBack);
-
-  let totalWins = 0;
-  let totalLosses = 0;
-  let totalTrades = 0;
-  let totalNetR = 0;
+  cutoff.setDate(cutoff.getDate() - daysBack);
+  let totals = { trades: 0, wins: 0, losses: 0, netR: 0 };
 
   for (const repo of REPOS) {
-
     const file = await getFile(repo.name);
     if (!file) continue;
-
-    const trades = file.data;
-
-    const periodTrades = trades.filter(t =>
-      t.result &&
-      new Date(t.closeTime) >= cutoff
-    );
-
-    const wins = periodTrades.filter(t => t.result === "WIN").length;
-    const losses = periodTrades.filter(t => t.result === "LOSS").length;
-    const repoTotal = periodTrades.length;
-
-    const repoNetR =
-      periodTrades.reduce((sum, t) =>
-        sum + (t.result === "WIN" ? t.rr : -1), 0);
-
-    if (repoTotal > 0) {
-      const winRate = ((wins / repoTotal) * 100).toFixed(1);
-
-      reportText += `
-${repo.label}
-Trades: ${repoTotal}
-Wins: ${wins}
-Losses: ${losses}
-Win Rate: ${winRate}%
-Net R: ${repoNetR > 0 ? "+" : ""}${repoNetR}R
-
-`;
+    const periodTrades = file.data.filter(t => t.result && t.result !== "CANCELLED" && new Date(t.closeTime) >= cutoff);
+    if (periodTrades.length > 0) {
+      const wins = periodTrades.filter(t => t.result === "WIN").length;
+      const losses = periodTrades.filter(t => t.result === "LOSS").length;
+      const netR = periodTrades.reduce((s, t) => s + (t.result === "WIN" ? t.rr : -1), 0);
+      reportText += `${repo.label}\nTrades: ${periodTrades.length}\nWins: ${wins} | Losses: ${losses}\nNet R: ${netR.toFixed(1)}R\n\n`;
+      totals.trades += periodTrades.length; totals.wins += wins; totals.losses += losses; totals.netR += netR;
     }
-
-    totalWins += wins;
-    totalLosses += losses;
-    totalTrades += repoTotal;
-    totalNetR += repoNetR;
   }
-
-  const overallWinRate =
-    totalTrades > 0 ? ((totalWins / totalTrades) * 100).toFixed(1) : 0;
-
-  reportText += `
-──────────────
-📈 Combined Portfolio
-
-Trades: ${totalTrades}
-Wins: ${totalWins}
-Losses: ${totalLosses}
-Win Rate: ${overallWinRate}%
-Net R: ${totalNetR > 0 ? "+" : ""}${totalNetR}R
-`;
-
+  const winRate = totals.trades > 0 ? ((totals.wins / totals.trades) * 100).toFixed(1) : 0;
+  reportText += `──────────────\n📈 Combined Portfolio\nTrades: ${totals.trades}\nWin Rate: ${winRate}%\nNet R: ${totals.netR.toFixed(1)}R`;
   await sendTelegram(reportText);
 }
 
-/* ---------------- MAIN ---------------- */
-
 (async () => {
-
+  console.log("MODE:", MODE);
   if (MODE === "scan") await runScanner();
   else if (MODE === "weekly") await runSummary(7, "Weekly Report");
   else if (MODE === "monthly") await runSummary(30, "Monthly Report");
-
 })();
