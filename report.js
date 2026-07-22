@@ -57,7 +57,6 @@ async function getFile(repo) {
   return { data: JSON.parse(content), sha: data.sha };
 }
 
-// ROBUST UPDATE FILE WITH RETRIES TO PREVENT CONFLICT FAILURES
 async function updateFile(repo, content) {
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
@@ -71,7 +70,7 @@ async function updateFile(repo, content) {
         method: "PUT",
         headers: { Authorization: `Bearer ${GITHUB_TOKEN}`, Accept: "application/vnd.github+json" },
         body: JSON.stringify({
-          message: "OmniSight: Close trade on MACD Warning (SL hit)",
+          message: "OmniSight: Close trade on MACD Warning / SL",
           content: Buffer.from(JSON.stringify(content, null, 2)).toString("base64"),
           sha: fresh.sha,
           branch: BRANCH
@@ -79,16 +78,12 @@ async function updateFile(repo, content) {
       });
 
       if (res.status === 200 || res.status === 201) {
-        console.log(`Successfully committed update to ${repo}`);
         return true;
-      } else {
-        const errText = await res.text();
-        console.log(`Attempt ${attempt} save failed for ${repo} (${res.status}): ${errText}`);
       }
     } catch (e) {
-      console.log(`Attempt ${attempt} exception saving ${repo}:`, e.message);
+      console.log(`Attempt ${attempt} error updating ${repo}:`, e.message);
     }
-    await new Promise(r => setTimeout(r, 2000)); // wait 2s before retry
+    await new Promise(r => setTimeout(r, 2000));
   }
   return false;
 }
@@ -151,13 +146,13 @@ async function runScanner() {
     for (let trade of trades) {
       if (trade.result !== null) continue;
 
-      // 1. OmniSight MACD Warning -> Treated as immediate Stop Loss (LOSS) & Closed
+      // 1. MACD Warning -> Treat as Immediate Stop Loss (Close Trade)
       if (trade.warningSentOmni !== true) {
         const macd = await getM5MACD(trade.symbol);
         const price = await getCurrentPrice(trade.symbol);
         
         if ((trade.direction === "BUY" && macd < 0) || (trade.direction === "SELL" && macd > 0)) {
-          await sendTelegram(`⚠⚠⚠ [OmniSight SL HIT] CLOSE ${trade.direction} ${getSymbolDisplay(trade.symbol)} NOW\nEntry: ${trade.entry}\nExit Price: ${price}\nMACD is ${macd < 0 ? 'Negative' : 'Positive'}\nResult: STOP LOSS (1.0R Loss)`);
+          await sendTelegram(`⚠⚠⚠ [OmniSight SL HIT] CLOSE ${trade.direction} ${getSymbolDisplay(trade.symbol)} NOW\nEntry: ${trade.entry}\nExit Price: ${price}\nMACD is ${macd < 0 ? 'Negative' : 'Positive'}\nResult: STOP LOSS (-1.0R)`);
           
           trade.warningSentOmni = true;
           trade.result = "LOSS";
@@ -167,12 +162,11 @@ async function runScanner() {
           if (!tracker.processed.includes(tradeIdentifier)) {
             tracker.processed.push(tradeIdentifier);
           }
-          
           updated = true;
         }
       }
 
-      // 2. Standard TP/SL Resolution Check
+      // 2. Standard TP/SL Settlement Check
       if (trade.result === null) {
         const tradeIdentifier = trade.id || `${trade.symbol}-${trade.openTime}`;
         if (!tracker.processed.includes(tradeIdentifier)) {
