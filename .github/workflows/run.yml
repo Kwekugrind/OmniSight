@@ -1,19 +1,27 @@
-name: OmniSight Scanner
+name: V3.0 Signal & Trade Bot
 
 on:
   workflow_dispatch:
     inputs:
+      source:
+        description: "Trigger source"
+        required: false
+        default: "cronjob"
       mode:
-        description: "scan | weekly | monthly"
+        description: "Bot mode (scan, weekly, monthly)"
         required: false
         default: "scan"
+
+permissions:
+  contents: write
 
 jobs:
   run:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Node
@@ -24,22 +32,19 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Run OmniSight Scanner
+      - name: Run Bot
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
-          MODE: ${{ github.event.inputs.mode }}
-        run: node report.js
+          TRIGGER_SOURCE: ${{ github.event.inputs.source || 'cronjob' }}
+          MODE: ${{ github.event.inputs.mode || 'scan' }}
+        run: node alert.js
 
-      - name: Commit tracker state
+      - name: Commit state and trades update
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions@github.com"
-
-          git add tracker_state.json
-
+          git add state.json trades.json
           git diff --cached --quiet && echo "No changes" && exit 0
-
-          git commit -m "Update tracker state"
+          git commit -m "Auto update bot state and trade logs"
           git push origin HEAD:main
