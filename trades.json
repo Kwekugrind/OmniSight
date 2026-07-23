@@ -1,1 +1,17 @@
-[]
+[
+  {
+    "id": "R_100-2026-07-23T17:00:00.000Z",
+    "repo": "Volatility 100 Bot",
+    "symbol": "R_100",
+    "direction": "BUY",
+    "entry": 548.59,
+    "sl": 526.1,
+    "tp1": 571.08,
+    "tp2": 593.57,
+    "tp3": 616.0600000000001,
+    "rr": 1.5,
+    "openTime": "2026-07-23 17:00:00",
+    "closeTime": null,
+    "result": null
+  }
+]
