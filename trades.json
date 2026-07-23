@@ -11,7 +11,7 @@
     "tp3": 616.0600000000001,
     "rr": 1.5,
     "openTime": "2026-07-23 17:00:00",
-    "closeTime": null,
-    "result": null
+    "closeTime": "2026-07-23T22:45:18.225Z",
+    "result": "LOSS"
   }
 ]
