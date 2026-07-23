@@ -1,6 +1,6 @@
 {
-  "name": "omnisight",
-  "version": "1.0.0",
+  "name": "volatility-100",
+  "version": "3.0.0",
   "type": "module",
   "dependencies": {
     "node-fetch": "^3.3.2",
