@@ -28,5 +28,20 @@
     "openTime": "2026-07-24 03:20:00",
     "closeTime": "2026-07-24T09:30:18.517Z",
     "result": "WIN"
+  },
+  {
+    "id": "R_100-2026-07-24T20:15:00.000Z",
+    "repo": "Volatility 100 Bot",
+    "symbol": "R_100",
+    "direction": "SELL",
+    "entry": 553.34,
+    "sl": 567.95,
+    "tp1": 538.73,
+    "tp2": 524.12,
+    "tp3": 509.51,
+    "rr": 1.5,
+    "openTime": "2026-07-24 20:15:00",
+    "closeTime": null,
+    "result": null
   }
 ]
