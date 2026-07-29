@@ -161,5 +161,23 @@
     "openTime": "2026-07-29 03:35:00",
     "closeTime": "2026-07-29T04:55:17.826Z",
     "result": "LOSS"
+  },
+  {
+    "id": "R_100-2026-07-29T11:50:00.000Z",
+    "repo": "Volatility 100 Bot",
+    "symbol": "R_100",
+    "direction": "BUY",
+    "entry": 567.06,
+    "sl": 553.43,
+    "tp1": 587.5049999999999,
+    "tp2": 594.3199999999999,
+    "tp3": 607.9499999999999,
+    "rr": 1.5,
+    "tp1Reached": false,
+    "macdEarlyFlipEpoch": null,
+    "lastInProfit": null,
+    "openTime": "2026-07-29 11:50:00",
+    "closeTime": null,
+    "result": null
   }
 ]
