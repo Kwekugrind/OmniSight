@@ -159,7 +159,7 @@
     "macdEarlyFlipEpoch": 1785300300,
     "lastInProfit": false,
     "openTime": "2026-07-29 03:35:00",
-    "closeTime": null,
-    "result": null
+    "closeTime": "2026-07-29T04:55:17.826Z",
+    "result": "LOSS"
   }
 ]
