@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "id": "R_50-2026-08-01T14:05:00.000Z",
+    "contractId": 1426479099,
+    "repo": "OmniSight (V50)",
+    "symbol": "R_50",
+    "direction": "SELL",
+    "entry": 110.5901,
+    "sl": 111.8578,
+    "tp1": 108.68855000000002,
+    "tp2": 108.05470000000003,
+    "tp3": 106.78700000000003,
+    "h1OpenAtEntry": 110.9487,
+    "tp1Reached": false,
+    "macdEarlyFlipEpoch": null,
+    "lastInProfit": null,
+    "rr": 1.5,
+    "openTime": "2026-08-01 14:05:00",
+    "closeTime": null,
+    "result": null
+  }
+]
