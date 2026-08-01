@@ -11,7 +11,7 @@
     "tp2": 108.05470000000003,
     "tp3": 106.78700000000003,
     "h1OpenAtEntry": 110.9487,
-    "tp1Reached": false,
+    "tp1Reached": true,
     "macdEarlyFlipEpoch": null,
     "lastInProfit": true,
     "rr": 1.5,
