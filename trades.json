@@ -12,7 +12,7 @@
     "tp3": 106.78700000000003,
     "h1OpenAtEntry": 110.9487,
     "tp1Reached": false,
-    "macdEarlyFlipEpoch": 1785593700,
+    "macdEarlyFlipEpoch": null,
     "lastInProfit": true,
     "rr": 1.5,
     "openTime": "2026-08-01 14:05:00",
