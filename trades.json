@@ -93,10 +93,10 @@
     "h1OpenAtEntry": 108.8545,
     "tp1Reached": false,
     "macdEarlyFlipEpoch": null,
-    "lastInProfit": null,
+    "lastInProfit": false,
     "rr": 1.5,
     "openTime": "2026-08-02 17:10:00",
-    "closeTime": null,
-    "result": null
+    "closeTime": "2026-08-02T17:20:16.097Z",
+    "result": "LOSS"
   }
 ]
