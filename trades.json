@@ -159,5 +159,25 @@
     "openTime": "2026-08-05 01:25:00",
     "closeTime": "2026-08-05 01:45:14",
     "result": "LOSS"
+  },
+  {
+    "id": "R_50-2026-08-05T02:10:00.000Z",
+    "contractId": 1506373199,
+    "repo": "OmniSight (V50)",
+    "symbol": "R_50",
+    "direction": "BUY",
+    "entry": 106.2291,
+    "sl": 105.6363,
+    "tp1": 107.1183,
+    "tp2": 107.4147,
+    "tp3": 108.0075,
+    "h1OpenAtEntry": 105.9841,
+    "tp1Reached": false,
+    "macdEarlyFlipEpoch": null,
+    "peakProfit": null,
+    "rr": 1.5,
+    "openTime": "2026-08-05 02:10:00",
+    "closeTime": null,
+    "result": null
   }
 ]
