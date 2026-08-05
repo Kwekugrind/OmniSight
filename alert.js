@@ -208,21 +208,3 @@ async function getDerivAccountId() {
   console.log(`   Account ID: ${account.account_id} (${account.account_type})`);
   return account.account_id;
 }
-
-async function getDerivOTP(accountId) {
-  const res = await fetch(`https://api.derivws.com/trading/v1/options/accounts/${accountId}/otp`, { method: "POST", headers: { "Deriv-App-ID": DERIV_APP_ID, "Authorization": `Bearer ${DERIV_TOKEN}` } });
-  const json = await res.json();
-  if (!res.ok) throw new Error(`getOTP failed: ${JSON.stringify(json.errors || json)}`);
-  console.log(`   OTP WebSocket URL obtained ✅`);
-  return json.data.url;
-}
-
-async function executeTrade(direction) {
-  if (!DERIV_TOKEN) { console.log("⚠️ DERIV_API_TOKEN not set. Skipping."); return null; }
-  if (!DERIV_APP_ID) { console.log("⚠️ DERIV_APP_ID not set. Skipping."); return null; }
-  if (!PROXY_URL || !PROXY_SECRET) { console.log("⚠️ PROXY_URL or PROXY_SECRET not set. Skipping."); return null; }
-  console.log(`🔄 Sending ${direction} trade via Cloudflare proxy...`);
-  const accountId = await getDerivAccountId();
-  const wsUrl = await getDerivOTP(accountId);
-  const slDollars = parseFloat((STAKE_USD * 0.5).toFixed(2));
-  const params = { buy: "1", price: STAKE_USD, parameters: { contract_type: direction === "BUY" ? "MULTUP" : "MULTDOWN", underlying_symbol: TRADING_SYMBOL, currency: "USD", amount: STAKE_USD, bas[...]
