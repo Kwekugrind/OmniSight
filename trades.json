@@ -247,7 +247,7 @@
     "symbol": "R_50",
     "direction": "SELL",
     "entry": 100.7475,
-    "sl": 103.1389,
+    "sl": 100.7475,
     "tp1": 97.1604,
     "tp2": 95.9647,
     "tp3": 93.57329999999999,
@@ -258,6 +258,7 @@
     "rr": 1.5,
     "openTime": "2026-08-07 00:10:00",
     "closeTime": null,
-    "result": null
+    "result": null,
+    "breakevenSet": true
   }
 ]
