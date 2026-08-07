@@ -16,7 +16,6 @@ const TRAIL_DROP_USD       = 3;    // Exit if profit drops this much from peak
 const BREAKEVEN_ACTIVATE_USD = 3.00; // Move SL to entry once profit hits this amount
 const COMMISSION_USD       = 0.16; // $0.16 for Live trades | $0.15 for Demo trades
 const ATR_PERIOD           = 14;
-const FRACTAL_LOOKBACK     = 6;
 const SETUP_EXPIRY_BARS    = 35;
 const MARKET_DATA_APP_ID   = "1089";
 const DERIV_APP_ID         = process.env.DERIV_APP_ID;
@@ -389,6 +388,17 @@ async function runScanMode() {
       await sendTelegram(`🛡️ *${REPO_LABEL} — Breakeven Protected*\nProfit reached $${BREAKEVEN_ACTIVATE_USD.toFixed(2)}. Stop loss moved to entry (${openTrade.entry.toFixed(4)}).`);
     }
 
+    // 2. BREAKEVEN PRICE TRIGGER: If armed and price reverses back to entry, close immediately
+    const breakevenHit = openTrade.breakevenSet && !openTrade.tp1Reached && (
+      (openTrade.direction === "BUY" && currentPrice <= openTrade.entry) ||
+      (openTrade.direction === "SELL" && currentPrice >= openTrade.entry)
+    );
+
+    if (breakevenHit) {
+      await closeWith("WIN", `Breakeven exit — price reversed back to entry (${openTrade.entry.toFixed(4)}) after hitting profit target`);
+      return;
+    }
+
     // 1. Hard SL Price Check
     const slBreached = openTrade.direction === "BUY" ? currentPrice <= openTrade.sl : currentPrice >= openTrade.sl;
     dbg(`slBreached: ${slBreached}, tp1Reached: ${openTrade.tp1Reached}, peakProfit: ${openTrade.peakProfit}`);
@@ -479,15 +489,19 @@ async function runScanMode() {
   const smaFast5 = sma(closes, 2), smaSlow5 = sma(closes, 50);
   const atr14 = calculateATR(candles, ATR_PERIOD);
 
-  // Evaluate H1 Trend Direction
+  // Evaluate H1 Trend Direction & Fresh Crossover
   const h1Candles = await fetchCandles(H1, 100);
-  let h1Dir = null, h1OpenAtEntry = null;
+  let h1Dir = null, h1OpenAtEntry = null, h1FreshCross = false;
   if (h1Candles && h1Candles.length >= 52) {
     const h1Closes = h1Candles.map(c => parseFloat(c.close)), h1ci = h1Candles.length - 2;
     const smaFast1h = sma(h1Closes, 2), smaSlow1h = sma(h1Closes, 50);
-    if (smaFast1h[h1ci] != null && smaSlow1h[h1ci] != null) {
+    if (smaFast1h[h1ci] != null && smaSlow1h[h1ci] != null && smaFast1h[h1ci-1] != null && smaSlow1h[h1ci-1] != null) {
       if (smaFast1h[h1ci] > smaSlow1h[h1ci]) h1Dir = "BUY";
       else if (smaFast1h[h1ci] < smaSlow1h[h1ci]) h1Dir = "SELL";
+
+      const crossedUp = (smaFast1h[h1ci-1] <= smaSlow1h[h1ci-1]) && (smaFast1h[h1ci] > smaSlow1h[h1ci]);
+      const crossedDown = (smaFast1h[h1ci-1] >= smaSlow1h[h1ci-1]) && (smaFast1h[h1ci] < smaSlow1h[h1ci]);
+      if (crossedUp || crossedDown) h1FreshCross = true;
     }
     h1OpenAtEntry = parseFloat(h1Candles[h1Candles.length - 1].open);
   }
@@ -513,13 +527,18 @@ async function runScanMode() {
 
   dbg(`H1 dir: ${h1Dir} | M15 dir: ${m15Dir} | M5 dir: ${m5Dir}`);
 
-  // ── Track H1 Trend Changes & First-Trade Status ────────────────────────
-  if (state.h1TrendDir !== h1Dir) {
+  // ── Track H1 Trend Changes & First-Trade Status (Robust Bootstrap Protection) ──
+  if (state.h1TrendDir == null) {
+    state.h1TrendDir = h1Dir;
+    state.firstTradeTaken = true; // Safe default on boot/reset to prevent mid-trend false triggers
+  } else if (h1FreshCross && state.h1TrendDir !== h1Dir) {
     state.h1TrendDir = h1Dir;
     state.firstTradeTaken = false; // Reset for the new H1 trend
     state.waitingFor = null;
     state.setupEpoch = null;
-    console.log(`New H1 trend detected (${h1Dir}) — first-trade mode activated.`);
+    console.log(`New H1 cross detected (${h1Dir}) — first-trade mode activated.`);
+  } else {
+    state.h1TrendDir = h1Dir;
   }
 
   // ── Timeframe Alignment & Arming Logic (First Trade vs Subsequent Trades Rule) ──
