@@ -1,8 +1,8 @@
 {
   "waitingFor": null,
   "setupEpoch": null,
-  "lastProcessedEpoch": 1786134600,
+  "lastProcessedEpoch": null,
   "lastTgUpdateId": 0,
-  "h1TrendDir": "SELL",
-  "firstTradeTaken": true
+  "h1TrendEpoch": null,
+  "trendTradeCount": 0
 }
