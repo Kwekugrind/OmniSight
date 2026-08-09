@@ -1,13 +1,13 @@
 {
-  "waitingFor": null,
-  "setupEpoch": null,
-  "lastProcessedEpoch": 1786280100,
+  "waitingFor": "SELL",
+  "setupEpoch": 1786280400,
+  "lastProcessedEpoch": 1786280400,
   "lastTgUpdateId": 531033451,
   "h1TrendEpoch": 1786276800,
   "phaseATriggeredEpoch": 1786258800,
-  "activeEntryType": null,
-  "pendingPullback": "SELL",
-  "pullbackEpoch": 1786279500,
+  "activeEntryType": "PHASE_B",
+  "pendingPullback": null,
+  "pullbackEpoch": null,
   "anticipatedTrend": "SELL",
   "trendTradeCount": 0
 }
