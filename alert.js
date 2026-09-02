@@ -7,8 +7,8 @@ import "dotenv/config"; // 🛡️ Automated Environment Loader
 // UNCOMMENT THE CONFIGURATION MATCHING YOUR REPOSITORY:
 
 // --- Server 2 Bots ---
-// const SYMBOL = "R_10"; const SYMBOL_NAME = "Volatility 10 Index"; const REPO_LABEL = "Test Bot (V10 Live)"; const MULTIPLIER = 400; const COMMISSION_USD = 0.16;
-const SYMBOL = "R_50"; const SYMBOL_NAME = "Volatility 50 Index"; const REPO_LABEL = "OmniSight (V50)"; const MULTIPLIER = 80; const COMMISSION_USD = 0.16;
+// const SYMBOL = "R_10"; const SYMBOL_NAME = "Volatility 10 Index"; const REPO_LABEL = "Test Bot (V10 Demo)"; const MULTIPLIER = 400; const COMMISSION_USD = 0.16;
+const SYMBOL = "R_50"; const SYMBOL_NAME = "Volatility 50 Index"; const REPO_LABEL = "OmniSight (V50 Demo)"; const MULTIPLIER = 80; const COMMISSION_USD = 0.16;
 // const SYMBOL = "1HZ100V"; const SYMBOL_NAME = "Volatility 100 (1s) Index"; const REPO_LABEL = "Ice Cream Machine"; const MULTIPLIER = 40; const COMMISSION_USD = 0.15;
 
 // --- Server 1 Bots ---
