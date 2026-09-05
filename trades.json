@@ -18,7 +18,9 @@
     "m30FractalUpgraded": false,
     "fibTpPrice": 98.73089999999999,
     "openTime": "2026-09-05 14:55:00",
-    "closeTime": null,
-    "result": null
+    "closeTime": "2026-09-05 16:40:04",
+    "result": "LOSS",
+    "resultSource": "server_close_confirmed",
+    "serverPnl": -3.949832215972494
   }
 ]
