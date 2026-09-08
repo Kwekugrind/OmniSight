@@ -1,1 +1,24 @@
-[]
+[
+  {
+    "id": "R_50-1788882605309",
+    "contractId": 12171920979,
+    "pending": false,
+    "repo": "OmniSight (V50)",
+    "symbol": "R_50",
+    "direction": "SELL",
+    "entry": 97.2033,
+    "sl": 98.1864,
+    "rr": null,
+    "entryType": "CONT_SELL (0%)",
+    "brokerSlAmount": 5,
+    "entryEpoch": 1788882600,
+    "fractalSl": 98.1864,
+    "fractalEpoch": null,
+    "fractalTimeframe": "M5",
+    "m30FractalUpgraded": false,
+    "fibTpPrice": 94.744,
+    "openTime": "2026-09-08 15:50:00",
+    "closeTime": null,
+    "result": null
+  }
+]
