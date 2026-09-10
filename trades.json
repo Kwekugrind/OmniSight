@@ -46,5 +46,27 @@
     "result": "LOSS",
     "resultSource": "deriv_settled_official",
     "serverPnl": -1.46
+  },
+  {
+    "id": "R_50-1789019412032",
+    "contractId": 12369757279,
+    "pending": false,
+    "repo": "OmniSight (V50)",
+    "symbol": "R_50",
+    "direction": "BUY",
+    "entry": 90.8059,
+    "sl": 90.3552,
+    "rr": null,
+    "entryType": "REV_BUY (-50 to 0) ($5 Ext)",
+    "brokerSlAmount": 5,
+    "entryEpoch": 1789019400,
+    "fractalSl": 90.3552,
+    "fractalEpoch": null,
+    "fractalTimeframe": "M5",
+    "m30FractalUpgraded": false,
+    "fibTpPrice": 91.97729610999998,
+    "openTime": "2026-09-10 05:50:00",
+    "closeTime": null,
+    "result": null
   }
 ]
