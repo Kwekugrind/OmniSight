@@ -117,5 +117,27 @@
     "result": "LOSS",
     "serverPnl": -3.35,
     "resultSource": "deriv_settled_official"
+  },
+  {
+    "id": "R_75-1789116312102",
+    "contractId": 12513729419,
+    "pending": false,
+    "repo": "Lery's Alerts (V75 Demo)",
+    "symbol": "R_75",
+    "direction": "BUY",
+    "entry": 46439.7976,
+    "sl": 45964.1545,
+    "rr": null,
+    "entryType": "REV_BUY (0 to 50) ($5 Ext)",
+    "brokerSlAmount": 5,
+    "entryEpoch": 1789116300,
+    "fractalSl": 45964.1545,
+    "fractalEpoch": null,
+    "fractalTimeframe": "M5",
+    "m30FractalUpgraded": false,
+    "fibTpPrice": 47396.457430559996,
+    "openTime": "2026-09-11 08:45:00",
+    "closeTime": null,
+    "result": null
   }
 ]
