@@ -139,5 +139,27 @@
     "openTime": "2026-09-11 08:45:00",
     "closeTime": null,
     "result": null
+  },
+  {
+    "id": "R_75-1789116605858",
+    "contractId": 12513726579,
+    "pending": false,
+    "repo": "Lery's Alerts (V75 Demo)",
+    "symbol": "R_75",
+    "direction": "BUY",
+    "entry": 5,
+    "sl": 4.9030000000000005,
+    "rr": null,
+    "entryType": "RECOVERED_LIVE",
+    "brokerSlAmount": 5,
+    "entryEpoch": 1789116310,
+    "fractalSl": null,
+    "fractalEpoch": null,
+    "fractalTimeframe": null,
+    "m30FractalUpgraded": false,
+    "fibTpPrice": null,
+    "openTime": "2026-09-11 08:45:10",
+    "closeTime": null,
+    "result": null
   }
 ]
