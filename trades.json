@@ -198,7 +198,7 @@
     "symbol": "R_50",
     "direction": "SELL",
     "entry": 87.9267,
-    "sl": 88.1591,
+    "sl": 88.1187,
     "rr": null,
     "entryType": "CONT_SELL (0 to -50) ($5 Ext)",
     "brokerSlAmount": 5,
