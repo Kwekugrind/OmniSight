@@ -309,9 +309,11 @@
     "fibTpPrice": null,
     "keyLevel": null,
     "openTime": "2026-09-17 18:00:09",
-    "closeTime": null,
-    "result": null,
+    "closeTime": "2026-09-17 20:00:10",
+    "result": "LOSS",
     "lockedPnlFloor": 7.8,
-    "htfShield": true
+    "htfShield": true,
+    "serverPnl": -0.2599999999999998,
+    "resultSource": "server_history_verified"
   }
 ]
