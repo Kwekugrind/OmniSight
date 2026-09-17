@@ -270,20 +270,21 @@
     "symbol": "R_50",
     "direction": "BUY",
     "entry": 5,
-    "sl": 4.9395,
+    "sl": 92.0708,
     "rr": null,
     "entryType": "RECOVERED_LIVE",
     "brokerSlAmount": 5,
     "entryEpoch": 1789647306,
     "fractalSl": null,
     "fractalEpoch": null,
-    "fractalTimeframe": null,
+    "fractalTimeframe": "M5_Trail",
     "m30FractalUpgraded": false,
     "fibTpPrice": null,
     "keyLevel": null,
     "openTime": "2026-09-17 12:15:06",
     "closeTime": null,
     "result": null,
-    "lockedPnlFloor": 7.8
+    "lockedPnlFloor": 7.8,
+    "htfShield": true
   }
 ]
