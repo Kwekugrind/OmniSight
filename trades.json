@@ -315,5 +315,29 @@
     "htfShield": true,
     "serverPnl": -0.2599999999999998,
     "resultSource": "server_history_verified"
+  },
+  {
+    "id": "R_50-1789741809185",
+    "contractId": 13465361959,
+    "pending": false,
+    "repo": "OmniSight (V50)",
+    "symbol": "R_50",
+    "direction": "SELL",
+    "entry": 90.4707,
+    "sl": 90.6707,
+    "rr": null,
+    "entryType": "CONT_SELL (100 to 161.8)",
+    "brokerSlAmount": 5,
+    "entryEpoch": 1789741800,
+    "fractalSl": null,
+    "fractalEpoch": null,
+    "fractalTimeframe": null,
+    "m30FractalUpgraded": false,
+    "fibTpPrice": 89.0441044,
+    "keyLevel": 90.499,
+    "htfShield": true,
+    "openTime": "2026-09-18 14:30:00",
+    "closeTime": null,
+    "result": null
   }
 ]
