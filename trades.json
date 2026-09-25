@@ -465,6 +465,8 @@
     "keyLevel": 87.5267,
     "openTime": "2026-09-25 16:15:00",
     "closeTime": null,
-    "result": null
+    "result": null,
+    "maxUnrealizedPnl": 4.7,
+    "lockedPnlFloor": 3.7
   }
 ]
