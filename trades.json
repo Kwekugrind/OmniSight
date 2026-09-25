@@ -464,9 +464,11 @@
     "fibTpPrice": 85.7569,
     "keyLevel": 87.5267,
     "openTime": "2026-09-25 16:15:00",
-    "closeTime": null,
-    "result": null,
-    "maxUnrealizedPnl": 6.72,
-    "lockedPnlFloor": 5.72
+    "closeTime": "2026-09-25 19:34:06",
+    "result": "WIN",
+    "maxUnrealizedPnl": 7.84,
+    "lockedPnlFloor": 6.84,
+    "resultSource": "estimated_fallback",
+    "serverPnl": 7.838617771476917
   }
 ]
