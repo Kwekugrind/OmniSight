@@ -504,7 +504,7 @@
     "symbol": "R_50",
     "direction": "SELL",
     "entry": 84.1225,
-    "sl": 84.4514,
+    "sl": 84.2978,
     "rr": null,
     "entryType": "SELL (0% to -50%) ($4.00 TP Floor)",
     "brokerSlAmount": 5,
