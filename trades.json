@@ -597,7 +597,9 @@
     "fibTpPrice": 83.9274,
     "keyLevel": 85.7632,
     "openTime": "2026-09-27 21:45:00",
-    "closeTime": null,
-    "result": null
+    "closeTime": "2026-09-27 23:48:26",
+    "result": "LOSS",
+    "resultSource": "estimated_fallback",
+    "serverPnl": -2.5467017931820894
   }
 ]
