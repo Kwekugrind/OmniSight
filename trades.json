@@ -522,5 +522,30 @@
     "result": "WIN",
     "resultSource": "estimated_fallback",
     "serverPnl": 4.338202026806136
+  },
+  {
+    "id": "R_50-1790521624044",
+    "contractId": 14642166459,
+    "pending": false,
+    "repo": "OmniSight (V50)",
+    "symbol": "R_50",
+    "direction": "BUY",
+    "entry": 85.4319,
+    "sl": 84.8588,
+    "rr": null,
+    "entryType": "BUY (79% to 100%) ($7.00 TP Floor)",
+    "brokerSlAmount": 5,
+    "entryEpoch": 1790521500,
+    "purchaseTimeEpoch": 1790521500,
+    "purchase_time": 1790521500,
+    "fractalSl": 84.8588,
+    "fractalEpoch": null,
+    "fractalTimeframe": "M15",
+    "m30FractalUpgraded": false,
+    "fibTpPrice": 87.0619,
+    "keyLevel": 85.16302,
+    "openTime": "2026-09-27 15:05:00",
+    "closeTime": null,
+    "result": null
   }
 ]
