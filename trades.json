@@ -601,5 +601,32 @@
     "result": "LOSS",
     "resultSource": "estimated_fallback",
     "serverPnl": -2.5467017931820894
+  },
+  {
+    "id": "R_50-1790593505451",
+    "contractId": 14748196379,
+    "pending": false,
+    "repo": "OmniSight (V50)",
+    "symbol": "R_50",
+    "direction": "BUY",
+    "entry": 5,
+    "sl": 4.9395,
+    "rr": null,
+    "entryType": "RECOVERED_LIVE",
+    "brokerSlAmount": 5,
+    "entryEpoch": 1790593385,
+    "fractalSl": null,
+    "fractalEpoch": null,
+    "fractalTimeframe": null,
+    "m30FractalUpgraded": false,
+    "fibTpPrice": null,
+    "keyLevel": null,
+    "openTime": "2026-09-28 11:03:05",
+    "closeTime": "2026-09-28 11:05:24",
+    "result": "WIN",
+    "maxUnrealizedPnl": 6504.63,
+    "lockedPnlFloor": 6503.13,
+    "resultSource": "server_close_confirmed",
+    "serverPnl": 6502.023999999999
   }
 ]
