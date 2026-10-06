@@ -792,7 +792,7 @@
       "epoch": 1791257400,
       "type": "UPPER_BEARISH"
     },
-    "maxUnrealizedPnl": 2.65,
-    "lockedPnlFloor": 0.5
+    "maxUnrealizedPnl": 4.04,
+    "lockedPnlFloor": 3.04
   }
 ]
