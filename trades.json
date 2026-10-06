@@ -786,6 +786,11 @@
     "keyLevel": 82.3437,
     "openTime": "2026-10-06 03:10:00",
     "closeTime": null,
-    "result": null
+    "result": null,
+    "opposingM15Fractal": {
+      "price": 83.3281,
+      "epoch": 1791257400,
+      "type": "UPPER_BEARISH"
+    }
   }
 ]
