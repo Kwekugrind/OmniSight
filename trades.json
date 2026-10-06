@@ -785,14 +785,16 @@
     "fibTpPrice": 85.238576,
     "keyLevel": 82.3437,
     "openTime": "2026-10-06 03:10:00",
-    "closeTime": null,
-    "result": null,
+    "closeTime": "2026-10-06 05:19:34",
+    "result": "WIN",
     "opposingM15Fractal": {
       "price": 83.3281,
       "epoch": 1791257400,
       "type": "UPPER_BEARISH"
     },
     "maxUnrealizedPnl": 6.39,
-    "lockedPnlFloor": 5.39
+    "lockedPnlFloor": 5.39,
+    "serverPnl": 5.4399999999999995,
+    "resultSource": "server_history_verified"
   }
 ]
