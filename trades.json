@@ -791,6 +791,8 @@
       "price": 83.3281,
       "epoch": 1791257400,
       "type": "UPPER_BEARISH"
-    }
+    },
+    "maxUnrealizedPnl": 2.65,
+    "lockedPnlFloor": 0.5
   }
 ]
