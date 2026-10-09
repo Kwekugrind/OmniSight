@@ -796,5 +796,31 @@
     "lockedPnlFloor": 5.39,
     "serverPnl": 5.4399999999999995,
     "resultSource": "server_history_verified"
+  },
+  {
+    "id": "R_50-1791521705653",
+    "contractId": 16214247639,
+    "pending": false,
+    "repo": "OmniSight (V50)",
+    "symbol": "R_50",
+    "direction": "SELL",
+    "entry": 79.1883,
+    "sl": 79.651551555,
+    "rr": null,
+    "entryType": "SELL (-50% to OPEN) ($4.00 TP Floor)",
+    "brokerSlAmount": 5,
+    "entryEpoch": 1791521700,
+    "purchaseTimeEpoch": 1791521700,
+    "purchase_time": 1791521700,
+    "fractalSl": 79.4724,
+    "fractalEpoch": null,
+    "fractalTimeframe": "M5",
+    "m5Fractal": 79.4724,
+    "m30FractalUpgraded": false,
+    "fibTpPrice": 77.5583,
+    "keyLevel": 81.3007,
+    "openTime": "2026-10-09 04:55:00",
+    "closeTime": null,
+    "result": null
   }
 ]
