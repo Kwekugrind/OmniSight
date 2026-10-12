@@ -1,1 +1,21 @@
-[]
+[
+  {
+    "contractId": 146061915,
+    "contract_id": 146061915,
+    "transaction_id": 42394363,
+    "symbol": "R_50",
+    "botName": "OmniSight",
+    "isS1": false,
+    "direction": "SELL",
+    "closeTime": "2026-10-12T08:56:17.078Z",
+    "time": "2026-10-12T08:56:17.078Z",
+    "serverPnl": 0.14,
+    "profit": 0.14,
+    "amount": 0.14,
+    "result": "WIN",
+    "reason": "cTrader Deal #42394363 (R_50)",
+    "longcode": "cTrader Deal #42394363 (R_50)",
+    "shortcode": "R_50",
+    "is_ctrader": true
+  }
+]
