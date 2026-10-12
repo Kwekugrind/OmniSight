@@ -1,15 +1,1 @@
-[
-  {
-    "contract_id": 284917990142,
-    "transaction_id": 284917990142,
-    "action_type": "SELL",
-    "profit": 5.24,
-    "pnl": 5.24,
-    "sell_price": 283.5,
-    "buy_price": 281.4,
-    "transaction_time": 1791750835292,
-    "longcode": "cTrader Statement Deal #284917990142 Position #284917990142",
-    "shortcode": "R_50",
-    "result": "WIN"
-  }
-]
+[]
