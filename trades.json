@@ -354,7 +354,9 @@
     "tpPrice": 84.2611,
     "fibTpPrice": 84.2611,
     "openTime": "2026-10-19 20:45:00",
-    "closeTime": null,
-    "result": null
+    "closeTime": "2026-10-19 20:49:07",
+    "result": "LOSS",
+    "serverPnl": -0.13,
+    "resultSource": "server_history_verified"
   }
 ]
