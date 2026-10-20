@@ -722,7 +722,7 @@
     "openTime": "2026-10-20 17:30:00",
     "closeTime": null,
     "result": null,
-    "unrealizedPnl": 0.15,
+    "unrealizedPnl": 0.13,
     "maxUnrealizedPnL": 0.33
   }
 ]
