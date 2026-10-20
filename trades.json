@@ -451,7 +451,7 @@
     "openTime": "2026-10-20 02:20:00",
     "closeTime": null,
     "result": null,
-    "unrealizedPnl": 3.67,
+    "unrealizedPnl": 3.31,
     "maxUnrealizedPnL": 3.7,
     "lockedPnlFloor": 1
   }
