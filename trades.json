@@ -483,9 +483,11 @@
     "tpPrice": 82.445,
     "fibTpPrice": 82.445,
     "openTime": "2026-10-20 05:40:00",
-    "closeTime": null,
-    "result": null,
-    "unrealizedPnl": -1.26,
-    "maxUnrealizedPnL": 0.85
+    "closeTime": "2026-10-20 07:00:07",
+    "result": "LOSS",
+    "unrealizedPnl": -1.45,
+    "maxUnrealizedPnL": 0.85,
+    "serverPnl": -1.41,
+    "resultSource": "server_history_verified"
   }
 ]
