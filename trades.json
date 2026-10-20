@@ -7,7 +7,7 @@
     "botName": "OmniSight",
     "isS1": false,
     "direction": "SELL",
-    "closeTime": "2026-10-12T08:56:17.078Z",
+    "closeTime": "2026-10-12 08:56:17",
     "time": "2026-10-12T08:56:17.078Z",
     "serverPnl": 0.14,
     "profit": 0.14,
@@ -16,7 +16,8 @@
     "reason": "cTrader Deal #42394363 (R_50)",
     "longcode": "cTrader Deal #42394363 (R_50)",
     "shortcode": "R_50",
-    "is_ctrader": true
+    "is_ctrader": true,
+    "resultSource": "ctrader_deal_confirmed"
   },
   {
     "id": "R_50-1792375803644",
@@ -44,10 +45,12 @@
     "tpPrice": 89.81224999999999,
     "fibTpPrice": 89.81224999999999,
     "openTime": "2026-10-19 02:10:00",
-    "closeTime": "2026-10-19 02:25:05",
-    "result": "CLOSED_EXTERNAL",
-    "serverPnl": 0,
-    "resultSource": "server_portfolio_reconciled"
+    "closeTime": "2026-10-19 02:20:04",
+    "result": "LOSS",
+    "serverPnl": -0.27,
+    "resultSource": "ctrader_deal_confirmed",
+    "profit": -0.27,
+    "amount": -0.27
   },
   {
     "id": "R_50-1792393803625",
@@ -75,10 +78,12 @@
     "tpPrice": 88.195,
     "fibTpPrice": 88.195,
     "openTime": "2026-10-19 07:10:00",
-    "closeTime": "2026-10-19 07:25:04",
-    "result": "CLOSED_EXTERNAL",
-    "serverPnl": 0,
-    "resultSource": "server_portfolio_reconciled"
+    "closeTime": "2026-10-19 07:20:04",
+    "result": "WIN",
+    "serverPnl": 0.91,
+    "resultSource": "ctrader_deal_confirmed",
+    "profit": 0.91,
+    "amount": 0.91
   },
   {
     "id": "R_50-1792427103979",
@@ -109,7 +114,9 @@
     "closeTime": "2026-10-19 16:25:06",
     "result": "LOSS",
     "serverPnl": -0.07,
-    "resultSource": "server_history_verified"
+    "resultSource": "ctrader_deal_confirmed",
+    "profit": -0.07,
+    "amount": -0.07
   },
   {
     "id": "R_50-1792427225110",
@@ -140,7 +147,9 @@
     "closeTime": "2026-10-19 16:27:06",
     "result": "LOSS",
     "serverPnl": -0.07,
-    "resultSource": "server_history_verified"
+    "resultSource": "ctrader_deal_confirmed",
+    "profit": -0.07,
+    "amount": -0.07
   },
   {
     "id": "R_50-1792427344831",
@@ -171,7 +180,9 @@
     "closeTime": "2026-10-19 16:29:07",
     "result": "LOSS",
     "serverPnl": -0.05,
-    "resultSource": "server_history_verified"
+    "resultSource": "ctrader_deal_confirmed",
+    "profit": -0.05,
+    "amount": -0.05
   },
   {
     "id": "R_50-1792436406597",
@@ -202,7 +213,9 @@
     "closeTime": "2026-10-19 19:00:08",
     "result": "LOSS",
     "serverPnl": -0.1,
-    "resultSource": "server_history_verified"
+    "resultSource": "ctrader_deal_confirmed",
+    "profit": -0.1,
+    "amount": -0.1
   },
   {
     "id": "R_50-1792436525007",
@@ -233,7 +246,9 @@
     "closeTime": "2026-10-19 19:02:07",
     "result": "LOSS",
     "serverPnl": -0.11,
-    "resultSource": "server_history_verified"
+    "resultSource": "ctrader_deal_confirmed",
+    "profit": -0.11,
+    "amount": -0.11
   },
   {
     "id": "R_50-1792436645330",
@@ -264,7 +279,9 @@
     "closeTime": "2026-10-19 19:04:07",
     "result": "LOSS",
     "serverPnl": -0.02,
-    "resultSource": "server_history_verified"
+    "resultSource": "ctrader_deal_confirmed",
+    "profit": -0.02,
+    "amount": -0.02
   },
   {
     "id": "R_50-1792442705393",
@@ -295,7 +312,9 @@
     "closeTime": "2026-10-19 20:45:06",
     "result": "LOSS",
     "serverPnl": -0.09,
-    "resultSource": "server_history_verified"
+    "resultSource": "ctrader_deal_confirmed",
+    "profit": -0.09,
+    "amount": -0.09
   },
   {
     "id": "R_50-1792442824903",
@@ -326,7 +345,9 @@
     "closeTime": "2026-10-19 20:47:07",
     "result": "LOSS",
     "serverPnl": -0.12,
-    "resultSource": "server_history_verified"
+    "resultSource": "ctrader_deal_confirmed",
+    "profit": -0.12,
+    "amount": -0.12
   },
   {
     "id": "R_50-1792442944999",
@@ -357,7 +378,9 @@
     "closeTime": "2026-10-19 20:49:07",
     "result": "LOSS",
     "serverPnl": -0.13,
-    "resultSource": "server_history_verified"
+    "resultSource": "ctrader_deal_confirmed",
+    "profit": -0.13,
+    "amount": -0.13
   },
   {
     "id": "R_50-1792448104055",
@@ -388,7 +411,9 @@
     "closeTime": "2026-10-19 22:15:05",
     "result": "LOSS",
     "serverPnl": -0.09,
-    "resultSource": "server_history_verified"
+    "resultSource": "ctrader_deal_confirmed",
+    "profit": -0.09,
+    "amount": -0.09
   },
   {
     "id": "R_50-1792458305366",
@@ -421,7 +446,9 @@
     "unrealizedPnl": -1.81,
     "maxUnrealizedPnL": 0,
     "serverPnl": -1.86,
-    "resultSource": "deriv_settled_official"
+    "resultSource": "ctrader_deal_confirmed",
+    "profit": -1.86,
+    "amount": -1.86
   },
   {
     "id": "R_50-1792462804208",
@@ -454,8 +481,10 @@
     "unrealizedPnl": 3.97,
     "maxUnrealizedPnL": 3.97,
     "lockedPnlFloor": 1,
-    "resultSource": "server_close_confirmed",
-    "serverPnl": 3.97
+    "resultSource": "ctrader_deal_confirmed",
+    "serverPnl": 3.93,
+    "profit": 3.93,
+    "amount": 3.93
   },
   {
     "id": "R_50-1792474805354",
@@ -488,7 +517,9 @@
     "unrealizedPnl": -1.45,
     "maxUnrealizedPnL": 0.85,
     "serverPnl": -1.41,
-    "resultSource": "server_history_verified"
+    "resultSource": "ctrader_deal_confirmed",
+    "profit": -1.41,
+    "amount": -1.41
   },
   {
     "id": "R_50-1792481162495",
@@ -516,7 +547,7 @@
     "openTime": "2026-10-20 07:25:05",
     "closeTime": null,
     "result": null,
-    "unrealizedPnl": -0.49,
+    "unrealizedPnl": 0.05,
     "maxUnrealizedPnL": 0.34
   }
 ]
