@@ -545,10 +545,12 @@
     "fibTpPrice": 82.3113,
     "keyLevel": null,
     "openTime": "2026-10-20 07:25:05",
-    "closeTime": null,
-    "result": null,
+    "closeTime": "2026-10-20 08:55:06",
+    "result": "LOSS",
     "unrealizedPnl": -1.48,
     "maxUnrealizedPnL": 0.99,
-    "h1Checked": true
+    "h1Checked": true,
+    "serverPnl": -1.6,
+    "resultSource": "deriv_settled_official"
   }
 ]
