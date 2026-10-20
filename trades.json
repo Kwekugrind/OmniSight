@@ -529,7 +529,7 @@
     "symbol": "R_50",
     "direction": "SELL",
     "entry": 83.3102,
-    "sl": 83.8996,
+    "sl": 83.7037,
     "rr": null,
     "entryType": "RECOVERED_LIVE_FAST",
     "brokerSlAmount": 5,
@@ -539,7 +539,7 @@
     "entryEpoch": 1792481105,
     "fractalSl": null,
     "fractalEpoch": null,
-    "fractalTimeframe": null,
+    "fractalTimeframe": "M15",
     "m30FractalUpgraded": false,
     "tpPrice": 82.3113,
     "fibTpPrice": 82.3113,
@@ -547,7 +547,8 @@
     "openTime": "2026-10-20 07:25:05",
     "closeTime": null,
     "result": null,
-    "unrealizedPnl": 0.52,
-    "maxUnrealizedPnL": 0.93
+    "unrealizedPnl": 0.9,
+    "maxUnrealizedPnL": 0.99,
+    "h1Checked": true
   }
 ]
