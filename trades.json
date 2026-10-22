@@ -1162,7 +1162,7 @@
     "symbol": "R_50",
     "direction": "BUY",
     "entry": 86.4207,
-    "sl": 85.9559,
+    "sl": 86.0997,
     "rr": null,
     "entryType": "V50_INITIAL_STOCH200_STOCH15_50 (BUY) (Dynamic Runner - Tiered Ratchet & Profit Exit)",
     "brokerSlAmount": 5,
@@ -1174,7 +1174,7 @@
     "purchase_time": 1792678800,
     "fractalSl": 85.9559,
     "fractalEpoch": null,
-    "fractalTimeframe": "M5",
+    "fractalTimeframe": "M15",
     "m5Fractal": 85.9559,
     "m30FractalUpgraded": false,
     "tpPrice": null,
@@ -1182,7 +1182,8 @@
     "openTime": "2026-10-22 14:20:00",
     "closeTime": null,
     "result": null,
-    "unrealizedPnl": -0.59,
-    "maxUnrealizedPnL": 1.39
+    "unrealizedPnl": -0.8,
+    "maxUnrealizedPnL": 1.39,
+    "h1Checked": true
   }
 ]
