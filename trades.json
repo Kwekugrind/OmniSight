@@ -236,7 +236,10 @@
     "openTime": "2026-10-23 17:10:00",
     "closeTime": null,
     "result": null,
-    "unrealizedPnl": -1.37,
-    "maxUnrealizedPnL": 0.77
+    "unrealizedPnl": -1.72,
+    "maxUnrealizedPnL": 0.77,
+    "h1Checked": true,
+    "serverPnl": null,
+    "resultSource": "deriv_settled_official"
   }
 ]
