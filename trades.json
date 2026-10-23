@@ -23,9 +23,11 @@
     "fibTpPrice": null,
     "keyLevel": null,
     "openTime": "2026-10-23 01:10:06",
-    "closeTime": null,
-    "result": null,
-    "unrealizedPnl": -0.94,
-    "maxUnrealizedPnL": 0
+    "closeTime": "2026-10-23 01:30:06",
+    "result": "LOSS",
+    "unrealizedPnl": -0.84,
+    "maxUnrealizedPnL": 0,
+    "serverPnl": -0.88,
+    "resultSource": "deriv_settled_official"
   }
 ]
