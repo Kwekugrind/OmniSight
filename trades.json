@@ -1290,7 +1290,9 @@
     "result": "LOSS",
     "unrealizedPnl": -1.05,
     "maxUnrealizedPnL": 0.9,
-    "serverPnl": -1.07,
-    "resultSource": "estimated_fallback"
+    "serverPnl": -1.11,
+    "resultSource": "ctrader_deal_confirmed",
+    "profit": -1.11,
+    "amount": -1.11
   }
 ]
