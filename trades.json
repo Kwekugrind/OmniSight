@@ -451,6 +451,8 @@
     "maxUnrealizedPnL": 1.34,
     "h1Checked": true,
     "serverPnl": -0.59,
-    "resultSource": "deriv_settled_official"
+    "resultSource": "ctrader_deal_confirmed",
+    "profit": -0.59,
+    "amount": -0.59
   }
 ]
