@@ -662,7 +662,9 @@
     "maxUnrealizedPnL": 1.61,
     "h1Checked": true,
     "serverPnl": -1.15,
-    "resultSource": "deriv_settled_official"
+    "resultSource": "ctrader_deal_confirmed",
+    "profit": -1.15,
+    "amount": -1.15
   },
   {
     "id": "R_50-1793017505788",
@@ -692,7 +694,7 @@
     "openTime": "2026-10-26 12:25:00",
     "closeTime": null,
     "result": null,
-    "unrealizedPnl": 0.06,
-    "maxUnrealizedPnL": 0.13
+    "unrealizedPnl": 0.16,
+    "maxUnrealizedPnL": 0.2
   }
 ]
