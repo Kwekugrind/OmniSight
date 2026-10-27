@@ -902,11 +902,15 @@
     "tpPrice": null,
     "fibTpPrice": null,
     "openTime": "2026-10-27 18:15:00",
-    "closeTime": null,
-    "result": null,
-    "unrealizedPnl": 2.6,
+    "closeTime": "2026-10-27 19:39:34",
+    "result": "WIN",
+    "unrealizedPnl": 2.48,
     "maxUnrealizedPnL": 3.54,
     "lockedPnlFloor": 2.3,
-    "trendRidingActive": true
+    "trendRidingActive": true,
+    "serverPnl": 2.24,
+    "profit": 2.24,
+    "amount": 2.24,
+    "resultSource": "ctrader_deal_confirmed"
   }
 ]
