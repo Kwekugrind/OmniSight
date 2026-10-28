@@ -941,8 +941,8 @@
     "openTime": "2026-10-28 14:35:00",
     "closeTime": null,
     "result": null,
-    "unrealizedPnl": 4.44,
-    "maxUnrealizedPnL": 4.85,
+    "unrealizedPnl": 5,
+    "maxUnrealizedPnL": 5,
     "lockedPnlFloor": 0.5,
     "maxStochK302015": 6.193935257280498,
     "minStochK302015": 6.193935257280498
