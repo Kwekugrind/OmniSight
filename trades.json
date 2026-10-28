@@ -947,6 +947,10 @@
     "maxStochK302015": 21.236142014339798,
     "minStochK302015": 6.193935257280498,
     "serverPnl": 3.94,
-    "resultSource": "deriv_settled_official"
+    "resultSource": "ctrader_deal_confirmed",
+    "profit": 3.94,
+    "amount": 3.94,
+    "exitReason": "+$3.50 Base Take Profit",
+    "reason": "+$3.50 Base Take Profit"
   }
 ]
