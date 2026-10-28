@@ -921,7 +921,7 @@
     "symbol": "R_50",
     "direction": "SELL",
     "entry": 86.4968,
-    "sl": 87.0116,
+    "sl": 85.9146,
     "rr": null,
     "entryType": "V50_INITIAL_ADX20_STOCH200_STOCH15 (SELL)",
     "brokerSlAmount": 5,
@@ -933,7 +933,7 @@
     "purchase_time": 1793198100,
     "fractalSl": 87.696,
     "fractalEpoch": null,
-    "fractalTimeframe": "M5",
+    "fractalTimeframe": "M15",
     "m5Fractal": 87.696,
     "m30FractalUpgraded": false,
     "tpPrice": null,
@@ -941,8 +941,10 @@
     "openTime": "2026-10-28 14:35:00",
     "closeTime": null,
     "result": null,
-    "unrealizedPnl": 4.21,
-    "maxUnrealizedPnL": 4.52,
-    "lockedPnlFloor": 0.5
+    "unrealizedPnl": 4.54,
+    "maxUnrealizedPnL": 4.61,
+    "lockedPnlFloor": 0.5,
+    "maxStochK302015": 6.193935257280498,
+    "minStochK302015": 6.193935257280498
   }
 ]
