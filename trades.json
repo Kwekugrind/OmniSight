@@ -1019,9 +1019,15 @@
     "tpPrice": null,
     "fibTpPrice": null,
     "openTime": "2026-10-29 19:15:00",
-    "closeTime": null,
-    "result": null,
+    "closeTime": "2026-10-29 19:55:05",
+    "result": "LOSS",
     "unrealizedPnl": 0,
-    "maxUnrealizedPnL": 0.51
+    "maxUnrealizedPnL": 0.51,
+    "serverPnl": -0.01,
+    "profit": -0.01,
+    "amount": -0.01,
+    "resultSource": "ctrader_deal_confirmed",
+    "exitReason": "Early Invalidation Exit",
+    "reason": "Early Invalidation Exit"
   }
 ]
