@@ -979,7 +979,7 @@
     "tpPrice": null,
     "fibTpPrice": null,
     "openTime": "2026-10-29 05:05:00",
-    "closeTime": "2026-10-29 05:25:06",
+    "closeTime": "2026-10-29 05:25:05",
     "result": "WIN",
     "unrealizedPnl": 0.95,
     "maxUnrealizedPnL": 1.81,
@@ -987,6 +987,10 @@
     "maxStochK302015": 79.92834465559721,
     "minStochK302015": 79.92834465559721,
     "serverPnl": 0.88,
-    "resultSource": "deriv_settled_official"
+    "resultSource": "ctrader_deal_confirmed",
+    "profit": 0.88,
+    "amount": 0.88,
+    "exitReason": "Closed-M5 Stoch (30,20,15) Level 20/80 Profit Exit",
+    "reason": "Closed-M5 Stoch (30,20,15) Level 20/80 Profit Exit"
   }
 ]
