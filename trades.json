@@ -979,10 +979,14 @@
     "tpPrice": null,
     "fibTpPrice": null,
     "openTime": "2026-10-29 05:05:00",
-    "closeTime": null,
-    "result": null,
-    "unrealizedPnl": 1.09,
+    "closeTime": "2026-10-29 05:25:06",
+    "result": "WIN",
+    "unrealizedPnl": 0.95,
     "maxUnrealizedPnL": 1.81,
-    "lockedPnlFloor": 0.5
+    "lockedPnlFloor": 0.5,
+    "maxStochK302015": 79.92834465559721,
+    "minStochK302015": 79.92834465559721,
+    "serverPnl": 0.88,
+    "resultSource": "deriv_settled_official"
   }
 ]
