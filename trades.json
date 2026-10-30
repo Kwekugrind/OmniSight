@@ -1123,9 +1123,9 @@
     "entryEpoch": 1793398200,
     "purchaseTimeEpoch": 1793398200,
     "purchase_time": 1793398200,
-    "stoch15_touched_extreme": false,
-    "stoch15_touched_extreme_epoch": null,
-    "lockedPnlFloor": null,
+    "stoch15_touched_extreme": true,
+    "stoch15_touched_extreme_epoch": 1793398341,
+    "lockedPnlFloor": 0.3,
     "fractalSl": 88.1632,
     "fractalEpoch": null,
     "fractalTimeframe": "M5",
@@ -1136,7 +1136,7 @@
     "openTime": "2026-10-30 22:10:00",
     "closeTime": null,
     "result": null,
-    "unrealizedPnl": 0.11,
-    "maxUnrealizedPnL": 0.12
+    "unrealizedPnl": 0.78,
+    "maxUnrealizedPnL": 0.78
   }
 ]
