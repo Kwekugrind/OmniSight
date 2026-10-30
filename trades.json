@@ -1056,11 +1056,15 @@
     "tpPrice": null,
     "fibTpPrice": null,
     "openTime": "2026-10-30 06:40:00",
-    "closeTime": null,
-    "result": null,
-    "unrealizedPnl": -0.61,
+    "closeTime": "2026-10-30 06:48:37",
+    "result": "LOSS",
+    "unrealizedPnl": -0.88,
     "maxUnrealizedPnL": 0,
     "stoch15_touched_extreme": true,
-    "lockedPnlFloor": 0.3
+    "lockedPnlFloor": 0.3,
+    "resultSource": "ctrader_deal_confirmed",
+    "serverPnl": -0.93,
+    "exitReason": "Stoch (15,1,1) crossed below Level 50 (48.0) after touching Level 80 — Immediate Exit ($-0.88)",
+    "reason": "Stoch (15,1,1) crossed below Level 50 (48.0) after touching Level 80 — Immediate Exit ($-0.88)"
   }
 ]
