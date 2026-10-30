@@ -1134,9 +1134,15 @@
     "tpPrice": null,
     "fibTpPrice": null,
     "openTime": "2026-10-30 22:10:00",
-    "closeTime": null,
-    "result": null,
+    "closeTime": "2026-10-30 22:43:20",
+    "result": "WIN",
     "unrealizedPnl": 0.41,
-    "maxUnrealizedPnL": 1.82
+    "maxUnrealizedPnL": 1.82,
+    "serverPnl": 0.23,
+    "profit": 0.23,
+    "amount": 0.23,
+    "resultSource": "ctrader_deal_confirmed",
+    "exitReason": "+$0.30 Software SL Lock (Stoch 15 Lvl 80/20 Touch)",
+    "reason": "+$0.30 Software SL Lock (Stoch 15 Lvl 80/20 Touch)"
   }
 ]
