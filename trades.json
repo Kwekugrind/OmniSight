@@ -1174,11 +1174,17 @@
     "tpPrice": 86.521,
     "fibTpPrice": 86.521,
     "openTime": "2026-10-31 04:35:00",
-    "closeTime": null,
-    "result": null,
+    "closeTime": "2026-10-31 04:40:34",
+    "result": "WIN",
     "unrealizedPnl": 0.47,
     "maxUnrealizedPnL": 0.6,
     "stoch25_touched_midline": true,
-    "stoch25_touched_midline_epoch": 1793421561
+    "stoch25_touched_midline_epoch": 1793421561,
+    "serverPnl": 0.21,
+    "profit": 0.21,
+    "amount": 0.21,
+    "resultSource": "ctrader_deal_confirmed",
+    "exitReason": "+$0.30 Software SL Lock (Stoch 15 Lvl 80/20 Touch)",
+    "reason": "+$0.30 Software SL Lock (Stoch 15 Lvl 80/20 Touch)"
   }
 ]
