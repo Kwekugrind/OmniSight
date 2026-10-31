@@ -1238,7 +1238,7 @@
     "symbol": "R_50",
     "direction": "BUY",
     "entry": 90.3097,
-    "sl": 89.68,
+    "sl": 89.8456,
     "brokerSlPrice": 89.055,
     "rr": null,
     "entryType": "V50_INITIAL_MACD_STOCH25 (BUY)",
@@ -1258,7 +1258,7 @@
     "lockedPnlFloor": null,
     "fractalSl": 89.8456,
     "fractalEpoch": null,
-    "fractalTimeframe": "M5",
+    "fractalTimeframe": "M15",
     "m5Fractal": 89.8456,
     "m30FractalUpgraded": false,
     "tpPrice": 91.055,
@@ -1266,7 +1266,7 @@
     "openTime": "2026-10-31 19:20:00",
     "closeTime": null,
     "result": null,
-    "unrealizedPnl": -1.33,
+    "unrealizedPnl": -1.25,
     "maxUnrealizedPnL": 0
   }
 ]
