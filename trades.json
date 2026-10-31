@@ -1221,9 +1221,13 @@
     "tpPrice": 86.4758,
     "fibTpPrice": 86.4758,
     "openTime": "2026-10-31 10:30:00",
-    "closeTime": null,
-    "result": null,
-    "unrealizedPnl": -1.66,
-    "maxUnrealizedPnL": 0.28
+    "closeTime": "2026-10-31 10:59:33",
+    "result": "LOSS",
+    "unrealizedPnl": -2.56,
+    "maxUnrealizedPnL": 0.28,
+    "resultSource": "ctrader_deal_confirmed",
+    "serverPnl": -2.6,
+    "exitReason": "Software SL hit — PnL $-2.56",
+    "reason": "Software SL hit — PnL $-2.56"
   }
 ]
