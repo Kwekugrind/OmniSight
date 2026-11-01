@@ -1469,7 +1469,7 @@
     "stoch25_touched_extreme_epoch": null,
     "stoch15_touched_extreme": false,
     "stoch15_touched_extreme_epoch": null,
-    "lockedPnlFloor": null,
+    "lockedPnlFloor": 0.3,
     "fractalSl": 90.2859,
     "fractalEpoch": null,
     "fractalTimeframe": "M5",
@@ -1480,7 +1480,9 @@
     "openTime": "2026-11-01 13:30:00",
     "closeTime": null,
     "result": null,
-    "unrealizedPnl": 0.61,
-    "maxUnrealizedPnL": 0.61
+    "unrealizedPnl": 0.05,
+    "maxUnrealizedPnL": 0.61,
+    "stoch25_touched_midline": true,
+    "stoch25_touched_midline_epoch": 1793540700
   }
 ]
