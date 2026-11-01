@@ -1390,8 +1390,8 @@
     "openTime": "2026-11-01 12:30:00",
     "closeTime": null,
     "result": null,
-    "unrealizedPnl": 0.25,
-    "maxUnrealizedPnL": 0.39,
+    "unrealizedPnl": 0.29,
+    "maxUnrealizedPnL": 0.59,
     "stoch25_touched_midline": true,
     "stoch25_touched_midline_epoch": 1793536500
   }
