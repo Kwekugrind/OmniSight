@@ -1388,7 +1388,7 @@
     "tpPrice": 89.3664,
     "fibTpPrice": 89.3664,
     "openTime": "2026-11-01 12:30:00",
-    "closeTime": "2026-11-01 12:55:07",
+    "closeTime": "2026-11-01 12:55:06",
     "result": "LOSS",
     "unrealizedPnl": -0.77,
     "maxUnrealizedPnL": 0.59,
@@ -1396,6 +1396,8 @@
     "stoch25_touched_midline_epoch": 1793536500,
     "exitReason": "Stoch (25,1,1) Level 50 Reversal Exit",
     "serverPnl": -0.8,
-    "resultSource": "deriv_settled_official"
+    "resultSource": "ctrader_deal_confirmed",
+    "profit": -0.8,
+    "amount": -0.8
   }
 ]
