@@ -1344,13 +1344,15 @@
     "fibTpPrice": 90.988,
     "keyLevel": null,
     "openTime": "2026-11-01 12:25:06",
-    "closeTime": "2026-11-01 12:30:07",
+    "closeTime": "2026-11-01 12:30:06",
     "result": "LOSS",
     "unrealizedPnl": -0.68,
     "maxUnrealizedPnL": 0.11,
     "serverPnl": -0.72,
-    "resultSource": "deriv_settled_official",
-    "exitReason": "Opposite Signal Position Flip (SELL)"
+    "resultSource": "ctrader_deal_confirmed",
+    "exitReason": "Opposite Signal Position Flip (SELL)",
+    "profit": -0.72,
+    "amount": -0.72
   },
   {
     "id": "R_50-1793536207487",
@@ -1388,7 +1390,7 @@
     "openTime": "2026-11-01 12:30:00",
     "closeTime": null,
     "result": null,
-    "unrealizedPnl": -0.54,
+    "unrealizedPnl": 0,
     "maxUnrealizedPnL": 0.1
   }
 ]
