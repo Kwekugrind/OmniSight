@@ -1524,11 +1524,17 @@
     "tpPrice": 89.7911,
     "fibTpPrice": 89.7911,
     "openTime": "2026-11-02 02:25:00",
-    "closeTime": null,
-    "result": null,
+    "closeTime": "2026-11-02 03:00:05",
+    "result": "LOSS",
     "unrealizedPnl": -0.87,
     "maxUnrealizedPnL": 0.65,
     "stoch8_touched_midline": true,
-    "stoch8_touched_midline_epoch": 1793586600
+    "stoch8_touched_midline_epoch": 1793586600,
+    "serverPnl": -0.81,
+    "profit": -0.81,
+    "amount": -0.81,
+    "resultSource": "ctrader_deal_confirmed",
+    "exitReason": "-$2.00 Software Stop Loss",
+    "reason": "-$2.00 Software Stop Loss"
   }
 ]
