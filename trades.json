@@ -167,9 +167,15 @@
     "tpPrice": 98.0646,
     "fibTpPrice": 98.0646,
     "openTime": "2026-11-04 14:20:00",
-    "closeTime": null,
-    "result": null,
+    "closeTime": "2026-11-04 14:25:05",
+    "result": "WIN",
     "unrealizedPnl": 0.14,
-    "maxUnrealizedPnL": 0.2
+    "maxUnrealizedPnL": 0.2,
+    "serverPnl": 0.13,
+    "profit": 0.13,
+    "amount": 0.13,
+    "resultSource": "ctrader_deal_confirmed",
+    "exitReason": "Stoch (15,1,1) Level 50 Profit Exit",
+    "reason": "Stoch (15,1,1) Level 50 Profit Exit"
   }
 ]
