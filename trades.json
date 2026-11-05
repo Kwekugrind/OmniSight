@@ -610,7 +610,7 @@
     "openTime": "2026-11-05 05:15:00",
     "closeTime": null,
     "result": null,
-    "unrealizedPnl": 0.92,
+    "unrealizedPnl": 1.07,
     "maxUnrealizedPnL": 1.4,
     "stoch8_touched_50": true,
     "stoch8_touched_50_epoch": 1793855700
