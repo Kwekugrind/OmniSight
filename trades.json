@@ -33,9 +33,15 @@
     "tpPrice": 97.2694,
     "fibTpPrice": 97.2694,
     "openTime": "2026-11-05 09:05:00",
-    "closeTime": null,
-    "result": null,
+    "closeTime": "2026-11-05 09:30:04",
+    "result": "LOSS",
     "unrealizedPnl": -0.88,
-    "maxUnrealizedPnL": 0.27
+    "maxUnrealizedPnL": 0.27,
+    "serverPnl": -0.89,
+    "profit": -0.89,
+    "amount": -0.89,
+    "resultSource": "ctrader_deal_confirmed",
+    "exitReason": "-$2.00 Software Stop Loss",
+    "reason": "-$2.00 Software Stop Loss"
   }
 ]
