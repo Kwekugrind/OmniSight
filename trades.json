@@ -167,9 +167,15 @@
     "tpPrice": 101.1661,
     "fibTpPrice": 101.1661,
     "openTime": "2026-11-05 15:55:00",
-    "closeTime": null,
-    "result": null,
+    "closeTime": "2026-11-05 16:32:17",
+    "result": "WIN",
     "unrealizedPnl": 2.6,
-    "maxUnrealizedPnL": 2.77
+    "maxUnrealizedPnL": 2.77,
+    "serverPnl": 2.86,
+    "profit": 2.86,
+    "amount": 2.86,
+    "resultSource": "ctrader_deal_confirmed",
+    "exitReason": "+$2.50 Hard Broker TP",
+    "reason": "+$2.50 Hard Broker TP"
   }
 ]
