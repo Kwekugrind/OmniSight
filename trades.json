@@ -123,12 +123,14 @@
     "tpPrice": 101.0293,
     "fibTpPrice": 101.0293,
     "openTime": "2026-11-05 15:05:00",
-    "closeTime": "2026-11-05 15:25:06",
+    "closeTime": "2026-11-05 15:25:05",
     "result": "LOSS",
     "unrealizedPnl": -2.14,
     "maxUnrealizedPnL": 0.52,
     "exitReason": "Entry Candle Invalidation SL: M5 candle closed at 99.7332 below Entry Candle Low (99.9773)",
     "serverPnl": -2.39,
-    "resultSource": "deriv_settled_official"
+    "resultSource": "ctrader_deal_confirmed",
+    "profit": -2.39,
+    "amount": -2.39
   }
 ]
