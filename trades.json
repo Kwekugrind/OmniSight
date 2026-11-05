@@ -291,12 +291,14 @@
     "tpPrice": 102.2304,
     "fibTpPrice": 102.2304,
     "openTime": "2026-11-05 20:45:00",
-    "closeTime": "2026-11-05 20:55:05",
+    "closeTime": "2026-11-05 20:55:04",
     "result": "LOSS",
     "unrealizedPnl": -0.09,
     "maxUnrealizedPnL": 0.7,
     "exitReason": "Stoch (8,1,1) Opposite Cross Exit: %K crossed below Level 50 (42.5 < 50) on closed M5 candle",
     "serverPnl": -0.21,
-    "resultSource": "deriv_settled_official"
+    "resultSource": "ctrader_deal_confirmed",
+    "profit": -0.21,
+    "amount": -0.21
   }
 ]
