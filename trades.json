@@ -211,9 +211,12 @@
     "tpPrice": 103.2058,
     "fibTpPrice": 103.2058,
     "openTime": "2026-11-06 14:40:00",
-    "closeTime": null,
-    "result": null,
-    "unrealizedPnl": -0.1,
-    "maxUnrealizedPnL": 0
+    "closeTime": "2026-11-06 14:42:06",
+    "result": "WIN",
+    "unrealizedPnl": 0.11,
+    "maxUnrealizedPnL": 0.11,
+    "exitReason": "FRACTAL_BODY_ANCHOR Stop Loss (TOUCH): M5 candle breached SL (101.9004, Low=101.8899)",
+    "serverPnl": 0,
+    "resultSource": "deriv_settled_official"
   }
 ]
