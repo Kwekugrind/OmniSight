@@ -325,9 +325,13 @@
     "tpPrice": 100.4793,
     "fibTpPrice": 100.4793,
     "openTime": "2026-11-06 19:25:00",
-    "closeTime": null,
-    "result": null,
-    "unrealizedPnl": -2.96,
-    "maxUnrealizedPnL": 0.53
+    "closeTime": "2026-11-06 20:01:25",
+    "result": "LOSS",
+    "unrealizedPnl": -3.45,
+    "maxUnrealizedPnL": 0.53,
+    "resultSource": "ctrader_deal_confirmed",
+    "serverPnl": -3.46,
+    "exitReason": "FRACTAL_BODY_ANCHOR Stop Loss (TOUCH) reached at 102.3873 (SL: 102.3852, PnL: -$3.45)",
+    "reason": "FRACTAL_BODY_ANCHOR Stop Loss (TOUCH) reached at 102.3873 (SL: 102.3852, PnL: -$3.45)"
   }
 ]
