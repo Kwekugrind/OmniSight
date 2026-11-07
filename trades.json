@@ -560,11 +560,11 @@
     "tpPrice": 96.836,
     "fibTpPrice": 96.836,
     "openTime": "2026-11-07 05:45:00",
-    "closeTime": null,
-    "result": null,
+    "closeTime": "2026-11-07 06:26:14",
+    "result": "CLOSED_EXTERNAL",
     "unrealizedPnl": 1.02,
     "maxUnrealizedPnL": 1.57,
-    "serverPnl": null,
+    "serverPnl": 0,
     "resultSource": "server_portfolio_reconciled"
   }
 ]
