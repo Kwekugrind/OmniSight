@@ -509,9 +509,13 @@
     "fibTpPrice": 98.8941,
     "keyLevel": null,
     "openTime": "2026-11-07 03:25:07",
-    "closeTime": null,
-    "result": null,
-    "unrealizedPnl": 1.8,
-    "maxUnrealizedPnL": 2.23
+    "closeTime": "2026-11-07 04:29:45",
+    "result": "WIN",
+    "unrealizedPnl": 2.4,
+    "maxUnrealizedPnL": 2.4,
+    "resultSource": "ctrader_deal_confirmed",
+    "serverPnl": 2.36,
+    "exitReason": "Fractal Range Take Profit Hit at 98.8934 (TP: 98.8941, PnL: +$2.40)",
+    "reason": "Fractal Range Take Profit Hit at 98.8934 (TP: 98.8941, PnL: +$2.40)"
   }
 ]
